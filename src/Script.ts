@@ -2,6 +2,32 @@ import Viewer from "./Application/Viewer"
 let viewer = Viewer.initialize(document.querySelector("canvas.webgl")!);
 
 
+document.addEventListener("toggleButtonEvent", (e) => {
+    //console.log("Toggle Event Received:", e.detail);
+    // Add your Three.js logic here
+});
+
+document.addEventListener("colorChangeEvent1", (e) => {
+   
+    //console.log(e)
+    (document.getElementById("color12")! as HTMLElement).style.background = (e as CustomEvent).detail;
+    // Change first material color in Three.js
+});
+
+document.addEventListener("colorChangeEvent2", (e) => {
+   // console.log("Color 2 Event Received:", e.detail);
+    // Change second material color in Three.js
+});
+
+document.addEventListener("colorChangeEvent3", (e) => {
+   // console.log("Color 3 Event Received:", e.detail);
+    // Change third material color in Three.js
+});
+
+document.addEventListener("checkboxEvent", (e) => {
+   // console.log("Checkbox Event Received:", e.detail);
+    // Enable/disable a feature in Three.js
+});
 // document.getElementById("B-splineCentripetal")!.onclick = function () {
 //   DrawBsplineSurfaceCentripetal();
 // }

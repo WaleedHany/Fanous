@@ -2,45 +2,105 @@ html {
   overflow: hidden;
 }
 
-.container {
-  display: flex;
-}
-
-.content {
-  flex: 1;
-  padding: 20px;
-}
-
-.right-margin {
-  width: 80px;
-  background-color: #f0f0f0;
-  right: 0;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-bottom: 10px;
-  top: 0;
+.ui-panel {
   position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
 }
 
-.button {
-  display: block;
-  width: 100%;
-  padding: 3px;
-  margin-top: 3px;
-  text-align: center;
-  background-color: #3498db; /* Set the button background color */
-  color: #fff; /* Set the button text color */
-  text-decoration: none;
+/* Panel Heading */
+.ui-panel h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+/* Toggle Button */
+.toggle-btn {
+  padding: 10px 15px;
+  font-size: 14px;
+  color: white;
+  background: #555;
   border: none;
-  font-family: 'Segoe UI';
-  font-weight: bold;
-  font-size: 10px;
   border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-bottom: 10px;
+}
+
+.toggle-btn:hover {
+  background: #777;
+}
+
+/* Color Picker Section */
+.color-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.color-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Color Button */
+.color-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: 0.3s;
+}
+
+.color-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Color Picker Input (Hidden by Default) */
+.color-picker {
+  display: none;
+}
+
+/* Checkbox */
+.checkbox-container {
+  margin-top: 15px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
   cursor: pointer;
 }
 
-.button:hover {
-  background-color: #2980b9; /* Set the button background color on hover */
+/* Custom Checkbox */
+.checkbox-container input {
+  display: none;
+}
+
+.checkbox-container .checkmark {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 8px;
+  transition: 0.3s;
+}
+
+.checkbox-container input:checked + .checkmark {
+  background: #4caf50;
 }
 
 body {
@@ -59,7 +119,7 @@ body {
   /* border:3px solid  #90c2eb; */
   outline: none;
   z-index: -1;
-  background-image: linear-gradient(180deg, #2f2f2f, #c8ab62c0);
+  background-image: linear-gradient(180deg, #13132e, rgba(117, 71, 56, 0.836))
 }
 /* background-image: linear-gradient(180deg, #31C9CF, rgb(255, 255, 255)); */
 /* #df5b98 */

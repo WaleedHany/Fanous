@@ -41,8 +41,8 @@ export default class Camera
         if (this.isPrespective)
         {
             this.instance = new THREE.PerspectiveCamera(45, this.sizes.width / this.sizes.height, 0.1, 4000)
-            this.instance.position.set(40, 40, 40)    
-            this.instance.lookAt(0,0,0)
+            this.instance.position.set(240, 70, 120)    
+            this.instance.lookAt(0,-150,0)
         }
         else
         { 
@@ -66,6 +66,7 @@ export default class Camera
         this.controls.mouseButtons.left = CameraControls.ACTION.NONE
         this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE
         this.controls.mouseButtons.middle = CameraControls.ACTION.TRUCK 
+        //this.controls.lookAt(0,50,0)
         // this.controls.boundaryEnclosesCamera
     }
 

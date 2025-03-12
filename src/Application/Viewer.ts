@@ -40,6 +40,7 @@ export default class Viewer {
   raycaster: Raycasting
   commands: Commands
   lantern:LanternParts
+  stars: THREE.Points|any
 
   private constructor(_canvas: HTMLCanvasElement) {
       Viewer.instanceNo += 1
@@ -94,7 +95,7 @@ export default class Viewer {
     this.commands = new Commands()
     this.raycaster = Raycasting.InitializeRaycaster(this.camera, this.scene, this.renderer, this.scene.children)
 
-    
+    this.addStars(3000)
   }
 
   #updateAxisCameraOreintation()
@@ -133,6 +134,7 @@ export default class Viewer {
   { 
       this.camera.update()
       this.renderer.update()
+      //this.animateStars()
   }
 
   unSelect()
@@ -186,5 +188,36 @@ export default class Viewer {
       axes.renderOrder = 1;  
       this.axisScene.remove(this.axes.get())     
       this.axisScene.add(axes)
+  }
+
+  addStars(count = 1000) {
+    const starGeometry = new THREE.BufferGeometry();
+    const starMaterial = new THREE.PointsMaterial({
+        color: 0xffffff, // White stars
+        size: 0.5, // Adjust star size
+        transparent: true
+    });
+
+    // Generate random positions
+    const starVertices = [];
+    for (let i = 0; i < count; i++) {
+        const x = (Math.random() - 0.5) * 4000 // Spread stars in space
+        const y = (Math.random() - 0.5) * 4000
+        const z = (Math.random() - 0.5) * 4000
+        starVertices.push(x, y, z);
+    }
+
+    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+
+    this.stars = new THREE.Points(starGeometry, starMaterial);
+    this.scene.add(this.stars);
+  }
+
+  animateStars() {
+    this.scene.traverse(obj => {
+        if (obj instanceof THREE.Points) {
+            obj.material.opacity = 0.5 + Math.sin(Date.now() * 0.001) * 0.5; // Twinkle effect
+        }
+    });
   }
 } 
