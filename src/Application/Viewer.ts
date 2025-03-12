@@ -75,7 +75,7 @@ export default class Viewer {
     this.environment = new Environment(this.scene)
 
     this.lantern = new LanternParts(this.renderer)
-    this.scene.add(this.lantern.object)
+    //this.scene.add(this.lantern.object)
     
     // Time
     this.time = new Time()

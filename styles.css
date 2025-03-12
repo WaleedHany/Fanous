@@ -47,6 +47,7 @@ body {
   overflow: hidden;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  
 }
 
 /* // Canvas class */
@@ -58,7 +59,7 @@ body {
   /* border:3px solid  #90c2eb; */
   outline: none;
   z-index: -1;
-  background-image: linear-gradient(180deg, #121212, #121717);
+  background-image: linear-gradient(180deg, #2f2f2f, #c8ab62c0);
 }
 /* background-image: linear-gradient(180deg, #31C9CF, rgb(255, 255, 255)); */
 /* #df5b98 */
