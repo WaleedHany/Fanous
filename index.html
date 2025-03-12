@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geometry Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+    
+  <body>
+      <div class="right-margin">
+        <!-- Your right margin with buttons goes here -->
+        <div style="font-family: 'Segoe UI';font-weight: bold;font-size: 14px;height: 20px;">Curves</div>
+        <div style=" border-bottom: 1px solid #777; margin-left: -10px;margin-right: -10px;"></div>
+        <label style="font-family: 'Segoe UI';font-weight: bold;font-size: 12px;;height: 8px">Bézier Curve</label>
+        <button class="button" id="GeneralBezier">General Bézier</button>
+        <button class="button" id="CubicBezier">Cubic Bézier</button>
+        <div style=" border-bottom: 1px solid #777; margin-left: -5px;margin-right: -5px;margin-top: 5px;"></div>
+        <label style="font-family: 'Segoe UI';font-weight: bold;font-size: 10px;;height: 8px">NURBS</label>
+        <button class="button" id="Nurbs">NURBS</button>
+        <div style=" border-bottom: 1px solid #777; margin-left: -5px;margin-right: -5px;margin-top: 3px;"></div>
+        <label style="font-family: 'Segoe UI';font-weight: bold;font-size: 12px;height: 8px">Interpolation</label>
+        <button class="button" id="Catmull">Catmull</button>
+        <label style="font-family: 'Segoe UI';font-weight: bold;font-size: 10px;height: 14px">BesselOverhouser</label>
+        <button class="button" id="BOChordLength">Chord length</button>
+        <button class="button" id="BOCentripetal">Centripetal</button>
+        <label style="font-family: 'Segoe UI';font-weight: bold;font-size: 10px;height: 8px">B-Spline</label>
+        <button class="button" id="BsplineInterpolationUniform">Uniform</button>
+        <button class="button" id="BsplineInterpolationChordLength">Chord length</button>
+        <button class="button" id="BsplineInterpolationCentripetal">Centripetal</button>
+        <label style="font-family: 'Segoe UI';font-weight: bold;font-size: 10px;height: 8px">Circular Arch</label>
+        <button class="button" id="CircularArch">CircularArch</button>
+        <label for="startAngle" style="font-family: 'Segoe UI';font-size: 10px;">Start Angle:</label>
+        <input type="text" id="startAngle" name="startAngle" value="0" style="width: 75px;border-radius: 4px;">
+        <label for="endAngle" style="font-family: 'Segoe UI';font-size: 10px;">End Angle:</label>
+        <input type="text" id="endAngle" name="endAngle" value="360" style="width: 75px;border-radius: 4px;">
+
+        <div style=" border-bottom: 1px solid #777; margin-left: -10px;margin-right: -10px; margin-top: 8px;"></div>
+        <div style="font-family: 'Segoe UI';font-weight: bold;font-size: 14px;height: 22px;">Surfaces</div>
+        <div style=" border-bottom: 1px solid #777; margin-left: -10px;margin-right: -10px;"></div>
+        <button class="button" id="BezierSurfacePatch">Bézier Surface</button>
+        <button class="button" id="NURBSsurfacePatch">NURBS Surface</button>
+        <button class="button" id="SurfaceOfRevolution">Revolution</button>
+        <button class="button" id="SweptSurface">Swept Surface</button>
+        <div style=" border-bottom: 1px solid #777; margin-left: -5px;margin-right: -5px;margin-top: 3px;"></div>
+        <label style="font-family: 'Segoe UI';font-weight: bold;font-size: 12px;height: 12px;margin-top: 5px;">Interpolation</label>
+        <button class="button" id="B-splineUniform">B-spline Uniform</button>
+        <button class="button" id="B-splineChordlength">B-spline Chord length</button>
+        <button class="button" id="B-splineCentripetal">B-spline Centripetal</button>
+        <div style=" border-bottom: 1px solid #777; margin-left: -5px;margin-right: -5px;margin-top: 10px;"></div>
+        <div style=" border-bottom: 1px solid #777; margin-left: -5px;margin-right: -5px;margin-top: 1px;"></div>
+        <div>
+          <label for="degree" style="font-family: 'Segoe UI';font-weight: bold;font-size: 12px;">Degree:</label>
+            <select id="degree" name="degree">
+              <option value=2>2</option>
+              <option value=3>3</option>
+              <option value=4>4</option>
+            </select>
+        </div>
+      </div>
+    <div id="app"></div>
+    <canvas id="canvas" class="webgl" ></canvas>
+    
+    <script id="vertexshader" type="vertex">
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    </script>   
+    <script id="fragmentshader" type="fragment">
+      uniform sampler2D baseTexture;
+      uniform sampler2D bloomTexture;
+      varying vec2 vUv;
+      void main(){
+        gl_FragColor = (texture2D(baseTexture, vUv) + vec4(1.0) * texture2D(bloomTexture, vUv));
+      }
+    </script>
+
+    <script type="module" src="/src/Script.ts"></script>
+  </body>
+</html>

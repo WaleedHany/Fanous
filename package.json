@@ -1,0 +1,28 @@
+{
+  "name": "geometryviewer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/ndarray": "^1.0.14",
+    "@types/numeric": "^1.2.6",
+    "@types/three": "^0.158.3",
+    "typescript": "^5.2.2",
+    "vite": "^5.4.5"
+  },
+  "dependencies": {
+    "@types/earcut": "^2.1.4",
+    "camera-controls": "^2.7.3",
+    "earcut": "^2.2.4",
+    "mathjs": "^12.1.0",
+    "ndarray": "^1.0.19",
+    "numeric": "^1.2.6",
+    "three": "^0.158.0",
+    "three-spritetext": "^1.8.1"
+  }
+}
