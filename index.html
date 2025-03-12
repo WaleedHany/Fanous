@@ -14,35 +14,33 @@
       <h3>Controls</h3>
 
       <!-- Toggle Button -->
-      <button id="toggleButton" class="toggle-btn">Enable Mode</button>
+      <button id="toggleButton" class="toggle-btn">Light On</button>
 
       <!-- Color Picker Section -->
       <div class="color-section">
-          <label>Choose Colors:</label>
-          
-          <!-- First Color -->
-          <div class="color-option" >
-              <button class="color-btn" id="color12" data-color="#ff5733" style="background: #ff5733;"></button>
-              <input type="color" class="color-picker" id="colorPicker1" data-event="colorChangeEvent1" value="#ff5733">
-          </div>
+          <label>Colors:</label>
 
           <!-- Second Color -->
           <div class="color-option">
-              <button class="color-btn" data-color="#33ff57" style="background: #33ff57;"></button>
+              <button class="color-btn" id="colorLamp" data-color="#33ff57" style="background: #33ff57;color: white;">
+              </button>
               <input type="color" class="color-picker" id="colorPicker2" data-event="colorChangeEvent2" value="#33ff57">
+              <span>Light</span>
+             
           </div>
 
           <!-- Third Color -->
           <div class="color-option">
-              <button class="color-btn" data-color="#3357ff" style="background: #3357ff;"></button>
+              <button class="color-btn" id="colorWood" data-color="#3357ff" style="background: #3357ff;"></button>
               <input type="color" class="color-picker" id="colorPicker3" data-event="colorChangeEvent3" value="#3357ff">
+              <span>Lamp</span>
           </div>
       </div>
 
       <!-- Checkbox -->
       <label class="checkbox-container">
           <input type="checkbox" id="featureToggle">
-          <span class="checkmark"></span> Enable Feature
+          <span class="checkmark"></span> Glass Pattern
       </label>
   </div>
 
@@ -124,18 +122,18 @@
       let isToggled = false;
       document.getElementById("toggleButton").addEventListener("click", function() {
           isToggled = !isToggled;
-          this.textContent = isToggled ? "Disable Mode" : "Enable Mode";
+          this.textContent = isToggled ? "Light Off" : "Light On";
           console.log("Toggle Button State:", isToggled);
           document.dispatchEvent(new CustomEvent("toggleButtonEvent", { detail: isToggled }));
-      });
+      })
 
       // Color Button Click (Opens Corresponding Color Picker)
       document.querySelectorAll(".color-btn").forEach(button => {
           button.addEventListener("click", function() {
               const picker = this.nextElementSibling; // Get corresponding color picker
               picker.click(); // Open the color picker
-          });
-      });
+          })
+      })
 
       // Color Picker Events (Each has a Unique Event Name)
       document.querySelectorAll(".color-picker").forEach(picker => {
@@ -144,14 +142,13 @@
               const eventName = this.getAttribute("data-event");
               console.log(`${eventName} - Color Changed:`, color);
               document.dispatchEvent(new CustomEvent(eventName, { detail: color }));
-          });
-      });
+          })
+      })
 
       // Checkbox Event
       document.getElementById("featureToggle").addEventListener("change", function() {
-          console.log("Checkbox State:", this.checked);
           document.dispatchEvent(new CustomEvent("checkboxEvent", { detail: this.checked }));
-      });
+      })
   </script>
   </body>
 </html>

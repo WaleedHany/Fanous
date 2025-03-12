@@ -16,6 +16,31 @@ let bottomDomeMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMateri
 let neckMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let texture = new THREE.Texture()
 let bump = new THREE.Texture()
+let storedColor:THREE.Color
+
+let lampOnMaterial = new THREE.MeshPhysicalMaterial({
+  metalness: .3,
+  roughness: .1,
+  envMapIntensity: 0.9,
+  clearcoat: 1, color:new THREE.Color(1.0, 0.75, 0.1),
+  transparent: true,
+  // transmission: .95,
+  opacity: .5,
+  reflectivity: 0.8,
+  ior: 0.9,
+  side: THREE.BackSide,
+})
+
+let lampOffMaterial = new THREE.MeshPhysicalMaterial({
+  metalness: 0.1,
+  roughness: 0.9,
+  envMapIntensity: 0.9,
+  clearcoat: 1,
+  transparent: true,
+  transmission: .95,
+  opacity: 0.6,
+  reflectivity: 0.8,
+})
 
 export default class LanternParts{
     TopDome:LanternPart|any
@@ -30,6 +55,7 @@ export default class LanternParts{
 
     object:THREE.Mesh|any
     textureLoader:THREE.TextureLoader
+  ornaments: THREE.Mesh|any
 
     constructor(renderer: Renderer) { 
       this.textureLoader = new THREE.TextureLoader();
@@ -84,8 +110,8 @@ export default class LanternParts{
 
           const neckMaterialTexture = colorTexture.clone()
           const neckMaterialBump = bumpTexture.clone()
-          neckMaterialTexture.repeat.set(0.25, 0.025)
-          neckMaterialBump.repeat.set   (0.25, 0.025)
+          neckMaterialTexture.repeat.set(6, 6)
+          neckMaterialBump.repeat.set   (6, 6)
 
           neckMaterial.map = footerMaterialTexture;
           neckMaterial.bumpMap = footerMaterialBump;
@@ -117,7 +143,7 @@ export default class LanternParts{
     this.TopDomeNeck = this.loadPointsFromSring(LanternNeck.object, neckMaterial)
     this.TopDomeBase = this.loadPointsFromSring(lanternTopFooter.object, footerMaterial)
     this.MidLamp = this.loadPointsFromSring(LanternMid.object)
-    this.BottomDomeBase = this.loadPointsFromSring(LanternBottomTop.object, footerMaterial)
+    this.BottomDomeBase = this.loadPointsFromSring(LanternBottomTop.object, neckMaterial)
     this.BottomDome = this.loadPointsFromSring(LanternBottom.object, bottomDomeMaterial) 
     const edges = this.loadPointsForEdgesFromString(Lanternedge.edge,6)
     this.TopDome.object.position.y +=  this.TopDome.height + this.TopDomeNeck.height + this.TopDomeBase.height + this.MidLamp.height-0.2
@@ -127,26 +153,15 @@ export default class LanternParts{
     //#region MidLamp
     this.MidLamp.object.position.y += this.MidLamp.height
     this.MidLamp.object.renderOrder = 0
-    this.MidLamp.updatematerial(new THREE.MeshPhysicalMaterial({
-      metalness: .2,
-      roughness: .05,
-      envMapIntensity: 0.9,
-      clearcoat: 1, color:new THREE.Color(1.0, 0.75, 0.1),
-      transparent: true,
-      // transmission: .95,
-      opacity: .5,
-      reflectivity: 0.2,
-      ior: 0.9,
-      side: THREE.BackSide,
-    }))
+    this.MidLamp.updatematerial(lampOnMaterial)
     this.glow = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width/2),  new THREE.ShaderMaterial({
       vertexShader: document.getElementById("atmosphereVertex")?.textContent!,
       fragmentShader: document.getElementById("atmosphereFragment")?.textContent!,
       uniforms: {
         uColor: { value: new THREE.Vector4(1.0, 0.75, 0.1, 0.4) },
-        glowStrength: { value: 1.5 },
+        glowStrength: { value: 2 },
       },
-      blending: THREE.AdditiveBlending, opacity:0.1, depthTest:false,
+      blending: THREE.AdditiveBlending, opacity:0.15, depthTest:false,
       side: THREE.BackSide        
   }))
   this.glow2 = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width/2.8),  new THREE.ShaderMaterial({
@@ -154,7 +169,7 @@ export default class LanternParts{
     fragmentShader: document.getElementById("atmosphereFragment")?.textContent!,
     uniforms: {
       uColor: { value: new THREE.Vector4(1.0, 0.95, 0.4, 0.4) },
-      glowStrength: { value: 1 },
+      glowStrength: { value: 1},
     },
     blending: THREE.AdditiveBlending, opacity:0.1, depthTest:false,
     side: THREE.BackSide        
@@ -166,14 +181,14 @@ export default class LanternParts{
   light.intensity=5
   light.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-22,this.MidLamp.object.position.z)
 
-  let ornaments = new THREE.Mesh(this.MidLamp.geometry, material.clone())
-  ornaments.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y,this.MidLamp.object.position.z)
+  this.ornaments = new THREE.Mesh(this.MidLamp.geometry, material.clone())
+  this.ornaments.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y,this.MidLamp.object.position.z)
   texture.repeat.set(0.12, 0.04)
   bump.repeat.set(0.12, 0.04)
-  ornaments.material.map = texture
-  ornaments.material.bumpMap = bump
-  ornaments.material.alphaMap = bump
-  ornaments.material.transparent= true
+  this.ornaments.material.map = texture
+  this.ornaments.material.bumpMap = bump
+  this.ornaments.material.alphaMap = bump
+  this.ornaments.material.transparent= true
   //#endregion // MidLamp
   this.object = new THREE.Mesh()
 
@@ -320,5 +335,32 @@ export default class LanternParts{
         )
         minY = 0
         return {points, width, height, avgX, minY}
+    }
+
+    changeLampColor(color:THREE.Color){
+      this.glow.material.uniforms.uColor.value.set(color.r, color.g, color.b, 0.4)
+      this.glow2.material.uniforms.uColor.value.set(color.r, color.g, color.b, 0.4)
+      this.MidLamp.object.material.color = color
+    }
+    changeWoodColor(color:THREE.Color){
+      material.color = color
+      neckMaterial.color = color
+      bottomDomeMaterial.color = color
+      footerMaterial.color = color
+    }
+    ToggleLight(light:boolean){
+      if(!light){
+        this.MidLamp.object.material = lampOffMaterial
+        this.object.remove(this.glow, this.glow2)
+      } 
+      else{
+        this.MidLamp.object.material = lampOnMaterial
+        this.object.add(this.glow, this.glow2)
+      }
+    }
+
+    Addornaments(addornaments:boolean){
+      if(addornaments) this.object.add(this.ornaments)
+      else this.object.remove(this.ornaments)
     }
 }
