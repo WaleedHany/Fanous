@@ -6,12 +6,10 @@ import Renderer from './Utils/Renderer'
 import Environment from './Models/Environment'
 import GlobalCoordinatesArrows from './Helpers/GlobalCoordinatesArrows'
 import Resources from './Utils/Resources'
-import Materials from './Models/Materials/Materials'
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera.ts'
 import SnippingTool from './Utils/SnippingTool'
 import Selection from './Utils/Selection'
 import Raycasting from './Utils/Raycasting'
-import Commands from './Commands/Commands'
 import LanternParts from './Objects/LanternParts'
 
 let instance:Viewer|null = null
@@ -33,14 +31,14 @@ export default class Viewer {
   cameraList: Camera[]
   renderer: Renderer
   time: Time
-  selection: Selection
+  selection: Selection|any
   environment: Environment
   axes: GlobalCoordinatesArrows
   snippingTool: SnippingTool
   raycaster: Raycasting
-  commands: Commands
   lantern:LanternParts
   stars: THREE.Points|any
+  // circle:THREE.Mesh
 
   private constructor(_canvas: HTMLCanvasElement) {
       Viewer.instanceNo += 1
@@ -84,18 +82,18 @@ export default class Viewer {
     
     // Snipping tool
     this.snippingTool = SnippingTool.initialize(this.canvas, this.camera, this.scene, this.renderer)
-    // Element selection/hover
-    this.selection = Selection.initialize(this.canvas, this.camera, this.scene, Materials.heighLightMaterial)
-    this.selection.enable()
 
     const origin = new THREE.Vector3(0, 0, 0)
     this.axes = new GlobalCoordinatesArrows(origin, 1.2)
     this.addAxes()
     this.camera.controls.addEventListener('updateAxisCamera', () => {this.#updateAxisCameraOreintation()})
-    this.commands = new Commands()
     this.raycaster = Raycasting.InitializeRaycaster(this.camera, this.scene, this.renderer, this.scene.children)
 
     this.addStars(3000)
+
+    // this.circle = new THREE.Mesh(new THREE.CircleGeometry(3,32), new THREE.MeshBasicMaterial({color:0xffffff}))
+    // this.circle.position.set(this.camera.instance.position.x - 100, this.camera.instance.position.y + 0,this.camera.instance.position.z- 0)
+    // this.scene.add(this.circle)
   }
 
   #updateAxisCameraOreintation()
@@ -107,8 +105,6 @@ export default class Viewer {
   }
 
   public static initialize(canvas: HTMLCanvasElement) {
-    // if(instance != null) instance.dispose()//
-    // return  new Viewer(canvas)//
     return instance ?? (instance = new Viewer(canvas));
   }
 
@@ -134,6 +130,8 @@ export default class Viewer {
   { 
       this.camera.update()
       this.renderer.update()
+      // this.circle.position.set(this.camera.instance.position.x - 100, this.camera.instance.position.y + 9,this.camera.instance.position.z-0)
+      // this.circle.lookAt(this.camera.instance.position)
       //this.animateStars()
   }
 
@@ -211,13 +209,5 @@ export default class Viewer {
 
     this.stars = new THREE.Points(starGeometry, starMaterial);
     this.scene.add(this.stars);
-  }
-
-  animateStars() {
-    this.scene.traverse(obj => {
-        if (obj instanceof THREE.Points) {
-            obj.material.opacity = 0.5 + Math.sin(Date.now() * 0.001) * 0.5; // Twinkle effect
-        }
-    });
   }
 } 

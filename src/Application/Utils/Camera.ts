@@ -63,16 +63,12 @@ export default class Camera
         this.controls.zoomSpeed  = 0.1
         this.controls.dollyToCursor = true
         this.controls.infinityDolly = true
-        this.controls.mouseButtons.left = CameraControls.ACTION.NONE
+        this.controls.mouseButtons.left = CameraControls.ACTION.ROTATE
         this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE
-        this.controls.mouseButtons.middle = CameraControls.ACTION.TRUCK 
-        //this.controls.lookAt(0,50,0)
-        // this.controls.boundaryEnclosesCamera
+        this.controls.mouseButtons.middle = CameraControls.ACTION.TRUCK
     }
 
     disableMotion(){
-        //this.controls.dollyToCursor = false
-        //this.controls.infinityDolly = false
         this.controls.mouseButtons.left = CameraControls.ACTION.NONE
         this.controls.mouseButtons.right = CameraControls.ACTION.NONE
         this.controls.mouseButtons.wheel = CameraControls.ACTION.NONE
@@ -80,15 +76,13 @@ export default class Camera
 
     enableMotion()
     {
-        //this.controls.dollyToCursor = true
-        //this.controls.infinityDolly = true
         this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK
         this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE
         this.controls.mouseButtons.wheel = CameraControls.ACTION.ZOOM
     }
 
     disableTruck(){
-        this.controls.mouseButtons.left = CameraControls.ACTION.NONE
+        this.controls.mouseButtons.left = CameraControls.ACTION.ROTATE
     }
     enableTruck(){
         this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK
