@@ -158,7 +158,7 @@ export default class LanternParts{
       fragmentShader: document.getElementById("atmosphereFragment")?.textContent!,
       uniforms: {
         uColor: { value: new THREE.Vector4(1.0, 0.75, 0.1, 0.4) },
-        glowStrength: { value: 2 },
+        glowStrength: { value: 2.2 },
       },
       blending: THREE.AdditiveBlending, opacity:0.15, depthTest:false,
       side: THREE.BackSide        
