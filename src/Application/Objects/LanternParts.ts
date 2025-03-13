@@ -61,8 +61,8 @@ export default class LanternParts{
   
       // Load textures asynchronously
       Promise.all([
-          this.loadTexture('../../public/Assets/DomeTexture.png'),
-          this.loadTexture('../../public/Assets/DomeBump.png')
+          this.loadTexture('public/Assets/Images/DomeTexture.png'),
+          this.loadTexture('public/Assets/Images/DomeBump.png')
       ]).then(([colorTexture, bumpTexture]) => {
      
         colorTexture.wrapS = THREE.RepeatWrapping;
