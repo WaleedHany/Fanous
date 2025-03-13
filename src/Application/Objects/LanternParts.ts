@@ -16,7 +16,6 @@ let bottomDomeMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMateri
 let neckMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let texture = new THREE.Texture()
 let bump = new THREE.Texture()
-let storedColor:THREE.Color
 
 let lampOnMaterial = new THREE.MeshPhysicalMaterial({
   metalness: .3,

@@ -1,4 +1,4 @@
-import {Scene, WebGLRenderer, PCFSoftShadowMap, CineonToneMapping, Vector2, Color} from 'three'
+import {Scene, WebGLRenderer/*, PCFSoftShadowMap, CineonToneMapping, Vector2, Color*/} from 'three'
 import Viewer from '../Viewer'
 import Camera from './Camera'
 import SceneSizes from './SceneSizes'

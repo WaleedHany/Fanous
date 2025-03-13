@@ -1,4 +1,4 @@
-import { Mesh, ArrowHelper, Group, Vector3, Sprite, BoxGeometry ,MeshBasicMaterial, EdgesGeometry, LineSegments, LineBasicMaterial} from "three";
+import { ArrowHelper, Group, Vector3, Sprite, BoxGeometry, EdgesGeometry, LineSegments, LineBasicMaterial} from "three";
 import SpriteText from 'three-spritetext'
 
 const hexX = 0xa6050d;

@@ -299,7 +299,7 @@ export class ViewerCameras{
     //     return this.#addMainAxisCamera(renderer)
     // }
 
-    update3DCameraPosition(x:number, y:number, z:number)
+    update3DCameraPosition(x:number, y:number/*, z:number*/)
     {
         this.mainCamera.controls.moveTo(x,y,x,false)
     }

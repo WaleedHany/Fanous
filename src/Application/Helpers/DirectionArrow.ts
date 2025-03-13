@@ -1,9 +1,7 @@
-import { ArrowHelper, ConeGeometry, CylinderGeometry, Group, Mesh, MeshBasicMaterial, Scene, Vector3 } from "three"
-import Vector3D from "../Geometry/Vector3D";
+import { ConeGeometry, CylinderGeometry, Group, Mesh, MeshBasicMaterial, Scene, Vector3 } from "three"
 
 const hex = 0x008000;
 const headLength = 3;
-const headWidth = 2;
 
 export default class DirectionArrow
 {
@@ -14,11 +12,11 @@ export default class DirectionArrow
     static material = new MeshBasicMaterial( {color: hex} );
     static materialDark = new MeshBasicMaterial( {color: 0x222222} );
 
-    constructor(faceNo:number, origin:Vector3D, direction:Vector3D, length: number)
+    constructor(faceNo:number, origin:Vector3, direction:Vector3, length: number)
     {
         this.faceNo = faceNo
-        this.direction = direction.toVector3()
-        this.origin = origin.toVector3()
+        this.direction = direction
+        this.origin = origin
         let arrowPosition = this.origin.clone().add(this.direction.clone().multiplyScalar(length-headLength/2))
         let midPoint = this.origin.clone().add(this.direction.clone().multiplyScalar((length-headLength)/2))
         let axisOfRotation = this.direction.cross(new Vector3(0,1,0))

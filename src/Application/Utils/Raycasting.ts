@@ -1,7 +1,7 @@
 import {
     Raycaster, Vector2, Vector3, Mesh, MeshBasicMaterial, 
     Triangle, PerspectiveCamera,  RingGeometry,
-    LineBasicMaterial, Scene, Object3D, Points, Intersection} from "three";
+    LineBasicMaterial, Scene, Object3D, Intersection} from "three";
 import EventEmitter from "./EventsEmitter";
 import Renderer from "./Renderer";
 import Camera from "./Camera";
@@ -97,7 +97,6 @@ import Camera from "./Camera";
             scale = scaleFactor / this.camera.instance.zoom
             this.marker.lookAt(cameraVector)
         }
-        intersection.object.layers.toggle(this.renderer.BLOOM_SCENE)
         this.marker.scale.set(scale, scale, 1)
       this.scene.add(this.marker)
       }
@@ -116,7 +115,6 @@ import Camera from "./Camera";
       }
       let scale = 1
       const intersection = this.raycaster.intersectObjects(this.scene.children)[0]
-      intersection.object.layers.toggle(this.renderer.BLOOM_SCENE)
       console.log(intersection)
       if(intersection != null) this.#getMarkerPosition(intersection, scale)        
     }
