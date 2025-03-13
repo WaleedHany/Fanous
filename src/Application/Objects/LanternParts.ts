@@ -57,7 +57,7 @@ export default class LanternParts{
   ornaments: THREE.Mesh|any
 
     constructor(renderer: Renderer) { 
-      this.textureLoader = new THREE.TextureLoader();
+      this.textureLoader = new THREE.TextureLoader()
   
       // Load textures asynchronously
       Promise.all([
@@ -65,64 +65,64 @@ export default class LanternParts{
           this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/DomeBump.png`)
       ]).then(([colorTexture, bumpTexture]) => {
      
-        colorTexture.wrapS = THREE.RepeatWrapping;
-        colorTexture.wrapT = THREE.RepeatWrapping;
-        colorTexture.repeat.set(0.040, 0.01); // Adjust as needed
+        colorTexture.wrapS = THREE.RepeatWrapping
+        colorTexture.wrapT = THREE.RepeatWrapping
+        colorTexture.repeat.set(0.040, 0.01) // Adjust as needed
 
-        bumpTexture.wrapS = THREE.RepeatWrapping;
-        bumpTexture.wrapT = THREE.RepeatWrapping;
-        bumpTexture.repeat.set(0.040, 0.01);
+        bumpTexture.wrapS = THREE.RepeatWrapping
+        bumpTexture.wrapT = THREE.RepeatWrapping
+        bumpTexture.repeat.set(0.040, 0.01)
 
         texture = colorTexture.clone()
         bump = bumpTexture.clone()
 
-          material.map = colorTexture;
-          material.bumpMap = bumpTexture;
+          material.map = colorTexture
+          material.bumpMap = bumpTexture
           material.bumpScale=20
-          material.transparent = true;
-          material.alphaTest = 0.5;
-          material.needsUpdate = true;
+          material.transparent = true
+          material.alphaTest = 0.5
+          material.needsUpdate = true
   
           const bottomMaterialTexture = colorTexture.clone()
           const bottomMaterialBump = bumpTexture.clone()
           bottomMaterialTexture.repeat.set(0.050, 0.025)
           bottomMaterialBump.repeat.set(0.050, 0.025)
 
-          bottomDomeMaterial.map = bottomMaterialTexture;
-          bottomDomeMaterial.bumpMap = bottomMaterialBump;
+          bottomDomeMaterial.map = bottomMaterialTexture
+          bottomDomeMaterial.bumpMap = bottomMaterialBump
           bottomDomeMaterial.bumpScale=20
-          bottomDomeMaterial.transparent = true;
-          bottomDomeMaterial.alphaTest = 0.5;
-          bottomDomeMaterial.needsUpdate = true;
+          bottomDomeMaterial.transparent = true
+          bottomDomeMaterial.alphaTest = 0.5
+          bottomDomeMaterial.needsUpdate = true
 
           const footerMaterialTexture = colorTexture.clone()
           const footerMaterialBump = bumpTexture.clone()
           footerMaterialTexture.repeat.set(0.05, 0.005)
           footerMaterialBump.repeat.set   (0.05, 0.005)
 
-          footerMaterial.map = footerMaterialTexture;
-          footerMaterial.bumpMap = footerMaterialBump;
+          footerMaterial.map = footerMaterialTexture
+          footerMaterial.bumpMap = footerMaterialBump
           footerMaterial.bumpScale=20
-          footerMaterial.transparent = true;
-          footerMaterial.alphaTest = 0.5;
-          footerMaterial.needsUpdate = true;
+          footerMaterial.transparent = true
+          footerMaterial.alphaTest = 0.5
+          footerMaterial.needsUpdate = true
 
           const neckMaterialTexture = colorTexture.clone()
           const neckMaterialBump = bumpTexture.clone()
           neckMaterialTexture.repeat.set(6, 6)
           neckMaterialBump.repeat.set   (6, 6)
 
-          neckMaterial.map = footerMaterialTexture;
-          neckMaterial.bumpMap = footerMaterialBump;
+          neckMaterial.map = footerMaterialTexture
+          neckMaterial.bumpMap = footerMaterialBump
           neckMaterial.bumpScale=20
-          neckMaterial.transparent = true;
-          neckMaterial.alphaTest = 0.5;
-          neckMaterial.needsUpdate = true;
+          neckMaterial.transparent = true
+          neckMaterial.alphaTest = 0.5
+          neckMaterial.needsUpdate = true
           // Now proceed with object creation after textures are loaded
-          this.createLanternObjects(renderer);
+          this.createLanternObjects(renderer)
       }).catch(error => {
-          console.error("Error loading textures:", error);
-      });
+          console.error("Error loading textures:", error)
+      })
     }
 
     loadTexture(path: string): Promise<THREE.Texture> {
@@ -132,8 +132,8 @@ export default class LanternParts{
               texture => resolve(texture), // On success, resolve the texture
               undefined,
               error => reject(error) // On error, reject the promise
-          );
-      });
+          )
+      })
   }
 
 
@@ -224,10 +224,10 @@ export default class LanternParts{
           uvs.push(i,j)
         } 
       }
-      const uvsArray = new Float32Array(uvs);
+      const uvsArray = new Float32Array(uvs)
        let indices: number[] = []
        const length = Math.floor(Math.sqrt(contourPoints.length/3))
-       for (let i = 0; i<(contourPoints.length/3)-length; i++)
+       for (let i = 0 ;i<(contourPoints.length/3)-length; i++)
            if(i == 0 || (i+1)%length != 0) indices.push(i, i+length, i+1, i+length, i+length+1, i+1)
        const meshGeometry = new THREE.BufferGeometry()
        const verticesArray = new Float32Array(contourPoints)
@@ -251,12 +251,12 @@ export default class LanternParts{
     
         let points = this.normalizePoints(vector3Array)
         let parts = []
-        for(let i = 0; i< numberOfEdges;i++){
+        for(let i = 0; i< numberOfEdges; i++){
           const angle = 44*i/(7*numberOfEdges)
           let uvs = []
           let contourPoints: number[] = []
-          for(let j = 0; j<points.points.length;j++){
-            for(let k = 0; k<points.points[j].length;k++)
+          for(let j = 0; j<points.points.length; j++){
+            for(let k = 0; k<points.points[j].length; k++)
             {
               if(angle == 0) points.points[j][k].x -= this.MidLamp.width/2 - points.width/4.1
               let point = points.points[j][k]
@@ -268,7 +268,7 @@ export default class LanternParts{
             }  
           }
 
-          const uvsArray = new Float32Array(uvs);
+          const uvsArray = new Float32Array(uvs)
           let indices: number[] = []
           const length = Math.floor(Math.sqrt(contourPoints.length/3))
           for (let i = 0; i<(contourPoints.length/3)-length; i++)
@@ -311,19 +311,19 @@ export default class LanternParts{
         // Compute total x sum and min y value
         vector3Array.forEach(group => {
             group.forEach(point => {
-              totalX += point.x;
-              count++;
+              totalX += point.x
+              count++
               if (point.y < minY) minY = point.y
               if (point.y > maxY) maxY = point.y
               if (point.x < minX) minX = point.x
               if (point.x > maxX) maxX = point.x
-          });
-        });
+          })
+        })
     
         let width = maxX-minX
         let height = maxY - minY
         // Calculate the average x value
-        const avgX = totalX / count;
+        const avgX = totalX / count
     
         let points = vector3Array.map(group =>
           group.map(point => new THREE.Vector3(
