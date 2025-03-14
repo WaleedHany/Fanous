@@ -1,4 +1,4 @@
-import {Scene, WebGLRenderer/*, PCFSoftShadowMap, CineonToneMapping, Vector2, Color*/} from 'three'
+import {CineonToneMapping, Scene, WebGLRenderer/*, PCFSoftShadowMap, CineonToneMapping, Vector2, Color*/} from 'three'
 import Viewer from '../Viewer'
 import Camera from './Camera'
 import SceneSizes from './SceneSizes'
@@ -29,6 +29,8 @@ export default class Renderer
             antialias: true,
             alpha: true,
         })
+        this.instance.toneMapping =  CineonToneMapping
+        this.instance.toneMappingExposure = 1
         this.instance.setSize(this.sizes.width, this.sizes.height)
         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1))
         this.instance.autoClear = false

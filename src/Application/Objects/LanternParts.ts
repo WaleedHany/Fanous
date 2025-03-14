@@ -9,40 +9,42 @@ import lanternTopFooter from "./lanternTopFooter"
 import LanternNeck from "./lanternNeck"
 import Renderer from "../Utils/Renderer"
 import Rotations from "../Geomtry/Rotations"
+import lanternTop2Head from "./LanternTop2Head"
 
+let headMaterial :THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.FrontSide, roughness:0.5, metalness:0.8, reflectivity:0.2 , depthTest:true, transparent:true}) //0x774315 //0x45D6D2
 let material:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35 }) //0x774315 //0x45D6D2
 let footerMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let bottomDomeMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let neckMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
-let texture = new THREE.Texture()
-let bump = new THREE.Texture()
+let ornamentMaterial:THREE.MeshPhysicalMaterial
+//let ornamentMaterial2:THREE.MeshPhysicalMaterial
 
 let lampOnMaterial = new THREE.MeshPhysicalMaterial({
-  metalness: .3,
-  roughness: .1,
-  envMapIntensity: 0.9,
-  clearcoat: 1, color:new THREE.Color(1.0, 0.75, 0.1),
+  metalness: .5,
+  roughness: 0.0,
+  envMapIntensity: 1,
+  clearcoat: 1, color:0xff9f1a, // 0xffbe33, //new THREE.Color(1.0, 0.75, 0.1),
   transparent: true,
-  // transmission: .95,
   opacity: .5,
-  reflectivity: 0.8,
+  reflectivity: 1,
   ior: 0.9,
   side: THREE.BackSide,
 })
 
 let lampOffMaterial = new THREE.MeshPhysicalMaterial({
-  metalness: 0.1,
-  roughness: 0.9,
+  metalness: 0.4,
+  roughness: 0.1,
   envMapIntensity: 0.9,
   clearcoat: 1,
   transparent: true,
   transmission: .95,
-  opacity: 0.6,
-  reflectivity: 0.8,
+  opacity: 0.4,
+  reflectivity: 1,
 })
 
 export default class LanternParts{
     TopDome:LanternPart|any
+    TopDomeHead:LanternPart|any
     TopDomeNeck:LanternPart|any
     TopDomeBase:LanternPart|any
     MidLamp:LanternPart|any
@@ -62,7 +64,8 @@ export default class LanternParts{
       // Load textures asynchronously
       Promise.all([
           this.loadTexture(`${import.meta.env.BASE_URL}Assets/Images/DomeTexture.png`),
-          this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/DomeBump.png`)
+          this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/DomeBump.png`),
+          // this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/GlassPattern.png`)
       ]).then(([colorTexture, bumpTexture]) => {
      
         colorTexture.wrapS = THREE.RepeatWrapping
@@ -73,14 +76,11 @@ export default class LanternParts{
         bumpTexture.wrapT = THREE.RepeatWrapping
         bumpTexture.repeat.set(0.040, 0.01)
 
-        texture = colorTexture.clone()
-        bump = bumpTexture.clone()
-
           material.map = colorTexture
           material.bumpMap = bumpTexture
           material.bumpScale=20
           material.transparent = true
-          material.alphaTest = 0.5
+          //material.alphaMap=bumpTexture
           material.needsUpdate = true
   
           const bottomMaterialTexture = colorTexture.clone()
@@ -92,7 +92,6 @@ export default class LanternParts{
           bottomDomeMaterial.bumpMap = bottomMaterialBump
           bottomDomeMaterial.bumpScale=20
           bottomDomeMaterial.transparent = true
-          bottomDomeMaterial.alphaTest = 0.5
           bottomDomeMaterial.needsUpdate = true
 
           const footerMaterialTexture = colorTexture.clone()
@@ -104,7 +103,6 @@ export default class LanternParts{
           footerMaterial.bumpMap = footerMaterialBump
           footerMaterial.bumpScale=20
           footerMaterial.transparent = true
-          footerMaterial.alphaTest = 0.5
           footerMaterial.needsUpdate = true
 
           const neckMaterialTexture = colorTexture.clone()
@@ -116,15 +114,39 @@ export default class LanternParts{
           neckMaterial.bumpMap = footerMaterialBump
           neckMaterial.bumpScale=20
           neckMaterial.transparent = true
-          neckMaterial.alphaTest = 0.5
           neckMaterial.needsUpdate = true
-          // Now proceed with object creation after textures are loaded
+          
+          ornamentMaterial = material.clone()
+          const ornamentMaterialTexture = colorTexture.clone()
+          const ornamentMaterialBump = bumpTexture.clone()
+          ornamentMaterialTexture.repeat.set(0.12, 0.04)
+          ornamentMaterialBump.repeat.set(0.12, 0.04)
+
+          ornamentMaterial.map = ornamentMaterialTexture
+          ornamentMaterial.bumpMap = ornamentMaterialBump
+          ornamentMaterial.alphaMap = ornamentMaterialBump
+          ornamentMaterial.transparent= true
+
+          // ornamentMaterial2 = material.clone()
+          // GlassPatternTexture.wrapS = THREE.RepeatWrapping
+          // GlassPatternTexture.wrapT = THREE.RepeatWrapping
+          // GlassPatternTexture.rotation = Math.PI
+          // const ornamentMaterialTexture2 = GlassPatternTexture
+          // const ornamentMaterialBump2 = GlassPatternTexture
+          // ornamentMaterialTexture2.repeat.set(0.118, 0.020)
+          // ornamentMaterialBump2.repeat.set(0.118, 0.020)
+
+          // ornamentMaterial2.map = ornamentMaterialTexture2
+          // ornamentMaterial2.bumpMap = ornamentMaterialBump2
+          // ornamentMaterial2.bumpScale = 40
+          // ornamentMaterial2.alphaMap = ornamentMaterialBump2
+          // ornamentMaterial2.transparent= true
+
           this.createLanternObjects(renderer)
       }).catch(error => {
           console.error("Error loading textures:", error)
       })
     }
-
     loadTexture(path: string): Promise<THREE.Texture> {
       return new Promise((resolve, reject) => {
           this.textureLoader.load(
@@ -136,24 +158,25 @@ export default class LanternParts{
       })
   }
 
-
   createLanternObjects(renderer: Renderer) {
     this.TopDome = this.loadPointsFromSring(LanternTop2.object)
+    this.TopDomeHead = this.loadPointsFromSring(lanternTop2Head.object, headMaterial)
     this.TopDomeNeck = this.loadPointsFromSring(LanternNeck.object, neckMaterial)
     this.TopDomeBase = this.loadPointsFromSring(lanternTopFooter.object, footerMaterial)
-    this.MidLamp = this.loadPointsFromSring(LanternMid.object)
+    this.MidLamp = this.loadPointsFromSring(LanternMid.object, lampOnMaterial)
     this.BottomDomeBase = this.loadPointsFromSring(LanternBottomTop.object, neckMaterial)
     this.BottomDome = this.loadPointsFromSring(LanternBottom.object, bottomDomeMaterial) 
     const edges = this.loadPointsForEdgesFromString(Lanternedge.edge,6)
     this.TopDome.object.position.y +=  this.TopDome.height + this.TopDomeNeck.height + this.TopDomeBase.height + this.MidLamp.height-0.2
+    this.TopDomeHead.object.position.y +=  this.TopDome.height + this.TopDomeNeck.height + this.TopDomeBase.height + this.MidLamp.height
+    this.TopDomeHead.object.position.x += 0.2
     this.TopDomeNeck.object.position.y +=  this.TopDomeNeck.height + this.TopDomeBase.height + this.MidLamp.height - 0.1
     this.TopDomeBase.object.position.y +=  this.TopDomeBase.height + this.MidLamp.height
     this.BottomDome.object.position.y -= this.BottomDomeBase.height -0.5
     //#region MidLamp
     this.MidLamp.object.position.y += this.MidLamp.height
     this.MidLamp.object.renderOrder = 0
-    this.MidLamp.updatematerial(lampOnMaterial)
-    this.glow = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width/2),  new THREE.ShaderMaterial({
+    this.glow = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width / 2),  new THREE.ShaderMaterial({
       vertexShader: document.getElementById("atmosphereVertex")?.textContent!,
       fragmentShader: document.getElementById("atmosphereFragment")?.textContent!,
       uniforms: {
@@ -163,51 +186,42 @@ export default class LanternParts{
       blending: THREE.AdditiveBlending, opacity:0.15, depthTest:false,
       side: THREE.BackSide        
   }))
-  this.glow2 = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width/2.8),  new THREE.ShaderMaterial({
+  this.glow2 = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width / 2.8),  new THREE.ShaderMaterial({
     vertexShader: document.getElementById("atmosphereVertex")?.textContent!,
     fragmentShader: document.getElementById("atmosphereFragment")?.textContent!,
     uniforms: {
       uColor: { value: new THREE.Vector4(1.0, 0.95, 0.4, 0.4) },
-      glowStrength: { value: 1},
+      glowStrength: { value: 1.1},
     },
-    blending: THREE.AdditiveBlending, opacity:0.1, depthTest:false,
+    blending: THREE.AdditiveBlending, opacity:0.3, depthTest:false,
     side: THREE.BackSide        
 }))
   this.glow.scale.set(1.5,1.3,1.5)
   this.glow.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-22,this.MidLamp.object.position.z)
-  this.glow2.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-34,this.MidLamp.object.position.z)
+  this.glow2.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-42,this.MidLamp.object.position.z)
   const light=new THREE.PointLight()
   light.intensity=5
   light.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-22,this.MidLamp.object.position.z)
 
-  this.ornaments = new THREE.Mesh(this.MidLamp.geometry, material.clone())
+  this.ornaments = new THREE.Mesh(this.MidLamp.geometry, ornamentMaterial)
   this.ornaments.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y,this.MidLamp.object.position.z)
-  texture.repeat.set(0.12, 0.04)
-  bump.repeat.set(0.12, 0.04)
-  this.ornaments.material.map = texture
-  this.ornaments.material.bumpMap = bump
-  this.ornaments.material.alphaMap = bump
-  this.ornaments.material.transparent= true
   //#endregion // MidLamp
   this.object = new THREE.Mesh()
 
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(4,0.8, 3), this.TopDome.object.material)
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(4,0.8, 3), headMaterial)
   ring.position.set(this.TopDome.object.position.x,this.TopDome.object.position.y+4,this.TopDome.object.position.z)
-    //  this.MidLamp.object.layers.toggle(renderer.BLOOM_SCENE)
-    //  this.MidLamp.object.userData = {isEmmisive: true}
-     
+  ring.renderOrder = 1
 
-     this.object.add(this.TopDome.object, this.TopDomeNeck.object, this.TopDomeBase.object,this.MidLamp.object,
-                   this.BottomDomeBase.object, this.BottomDome.object, this.glow, this.glow2 ,light, ring) //, ornaments
+     this.object.add(ring, this.TopDome.object, this.TopDomeNeck.object, this.TopDomeBase.object,this.MidLamp.object,
+                   this.BottomDomeBase.object, this.BottomDome.object, this.glow, this.glow2 ,light) //, ornaments,, this.TopDomeHead.object
 
     for(let edge of edges){
       edge.object.position.y += edge.height
-      //edge.object.scale.set(1.045,1,1.045)
         edge.object.position.x += 0.5
        this.object.add(edge.object)
      }
     renderer.scene.add(this.object)
-}
+  }
 
 
     createObject(points:{points:THREE.Vector3[][], width:number, height:number, avgX:number, minY:number}, definedMaterial:THREE.Material|null = null)
@@ -346,6 +360,7 @@ export default class LanternParts{
       neckMaterial.color = color
       bottomDomeMaterial.color = color
       footerMaterial.color = color
+      ornamentMaterial.color = color
     }
     ToggleLight(light:boolean){
       if(!light){

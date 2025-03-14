@@ -121,7 +121,7 @@ body {
   /* border:3px solid  #90c2eb; */
   outline: none;
   z-index: -1;
-  background-image: linear-gradient(to bottom, #1e1a2e, rgb(32, 24, 64),  rgb(102, 71, 69));
+  background-image: linear-gradient(to bottom, #171422, rgb(27, 21, 53),  rgb(90, 63, 61));
 }
 /* linear-gradient(to bottom, #232526, #414345, #757f9a, #d7dde8) */
 /* linear-gradient(to bottom, #1a1a2e, #16213e, #0f3460, rgba(117, 71, 56, 0.836)) */

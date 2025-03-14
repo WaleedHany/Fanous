@@ -11,6 +11,7 @@ import SnippingTool from './Utils/SnippingTool'
 import Selection from './Utils/Selection'
 import Raycasting from './Utils/Raycasting'
 import LanternParts from './Objects/LanternParts'
+import CameraControls from 'camera-controls'
 
 let instance:Viewer|null = null
 
@@ -38,7 +39,6 @@ export default class Viewer {
   raycaster: Raycasting
   lantern:LanternParts
   stars: THREE.Points|any
-  // circle:THREE.Mesh
 
   private constructor(_canvas: HTMLCanvasElement) {
       Viewer.instanceNo += 1
@@ -71,7 +71,7 @@ export default class Viewer {
 
     // Main view
     this.resources = new Resources()
-    this.environment = new Environment(this.scene)
+    this.environment = new Environment(this.scene, this.camera)
 
     this.lantern = new LanternParts(this.renderer)
     //this.scene.add(this.lantern.object)
@@ -91,9 +91,6 @@ export default class Viewer {
 
     this.addStars(3000)
 
-    // this.circle = new THREE.Mesh(new THREE.CircleGeometry(3,32), new THREE.MeshBasicMaterial({color:0xffffff}))
-    // this.circle.position.set(this.camera.instance.position.x - 100, this.camera.instance.position.y + 0,this.camera.instance.position.z- 0)
-    // this.scene.add(this.circle)
   }
 
   #updateAxisCameraOreintation()
@@ -130,8 +127,18 @@ export default class Viewer {
   { 
       this.camera.update()
       this.renderer.update()
-      // this.circle.position.set(this.camera.instance.position.x - 100, this.camera.instance.position.y + 9,this.camera.instance.position.z-0)
-      // this.circle.lookAt(this.camera.instance.position)
+      if(this.camera?.instance?.position != null && this.environment.moon != null)
+      {  
+        let scale = this.camera?.instance?.position?.sub(this.environment.moon?.position)?.length()/18
+        this.environment.moon?.scale.set(1.3*scale,scale,1)
+        let target
+        (this.camera?.controls as CameraControls).getTarget(target= new THREE.Vector3(), true)
+        let dot = target.clone().sub(this.camera?.instance?.position).normalize()
+        .dot(new THREE.Vector3(0,1,0))//this.environment.moon.position.clone().sub(this.camera?.instance?.position).normalize())
+        if(dot< -0.4) 
+          this.scene.remove(this.environment.moon)
+        else this.scene.add(this.environment.moon)
+      }
       //this.animateStars()
   }
 
