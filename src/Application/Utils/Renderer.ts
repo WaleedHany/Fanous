@@ -3,6 +3,7 @@ import {
     ACESFilmicToneMapping,
     SRGBColorSpace,
     RGBAFormat,
+    LinearSRGBColorSpace,
 } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -47,7 +48,7 @@ export default class Renderer {
         this.instance.autoClear = false
         this.instance.setClearColor(0x000000, 0)  // Ensure transparency
         this.instance.domElement.style.background = "none";
-        this.instance.outputEncoding = SRGBColorSpace
+        this.instance.outputColorSpace = LinearSRGBColorSpace 
     }
 
     setPostProcessing() {
@@ -74,7 +75,7 @@ export default class Renderer {
 
     resize() {
         this.instance.setSize(this.sizes.width, this.sizes.height)
-        this.composer.setSize(this.sizes.width, this.sizes.height) // Update composer size
+        this.composer.setSize(this.sizes.width, this.sizes.height)
         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1))
         this.application.cameraList.forEach(c => c.instance.updateProjectionMatrix())
     }
@@ -82,7 +83,7 @@ export default class Renderer {
     update() {
         if (this.application.cameraList.length === 1 && !this.application.allowAxisScene) {
             this.instance.setScissorTest(false)
-            this.composer.render()  // Use EffectComposer instead of instance.render()
+            this.composer.render() 
         } else {
             this.instance.setScissorTest(true)
             this.instance.setViewport(
@@ -97,7 +98,6 @@ export default class Renderer {
             )
             this.application.axisCamera.updateProjectionMatrix()
             this.instance.render(this.application.axisScene, this.application.axisCamera)
-
             let left = this.camera.x * this.sizes.width
             let bottom = this.sizes.height - ((this.camera.heightRatio * this.sizes.height) + (this.camera.y * this.sizes.height))
             let width = this.camera.widthRatio * this.sizes.width
@@ -106,8 +106,8 @@ export default class Renderer {
             this.instance.setScissor(left, bottom, width, height)
             this.camera.instance.updateProjectionMatrix()
 
-            // Render with post-processing for the main scene
             this.composer.render()
+            this.instance.setScissorTest(false);
         }
     }
 }

@@ -54,7 +54,7 @@ export default class LanternParts{
     BottomDome:LanternPart|any
     edge:LanternPart|any
     glow:THREE.Mesh|any
-    glow2:THREE.Mesh|any
+    //glow2:THREE.Mesh|any
     hangerRing:THREE.Mesh|any
     object:THREE.Mesh|any
     textureLoader:THREE.TextureLoader
@@ -205,7 +205,7 @@ export default class LanternParts{
  // this.glow.scale.set(1.5,1.4,1.5)
  //this.glow.scale.set(0.9,0.9,0.9)
   this.glow.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y,this.MidLamp.object.position.z)
-  this.glow2.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-42,this.MidLamp.object.position.z)
+  //this.glow2.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-42,this.MidLamp.object.position.z)
   const light=new THREE.PointLight()
   light.intensity=5
   light.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-22,this.MidLamp.object.position.z)
@@ -307,7 +307,6 @@ export default class LanternParts{
           if(definedMaterial != null) objectMaterial = definedMaterial
           parts.push( new LanternPart(meshGeometry, points.height, points.width, points.avgX, points.minY, objectMaterial) )
         }
-     
         return parts
     }
 
