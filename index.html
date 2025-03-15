@@ -22,17 +22,17 @@
 
           <!-- Second Color -->
           <div class="color-option">
-              <button class="color-btn" id="colorLamp" data-color="#33ff57" style="background: #FF9F1A;color: white;">
+              <button class="color-btn" id="colorLamp" data-color="#ff820f" style="background: #ff820f;color: white;">
               </button>
-              <input type="color" class="color-picker" id="colorPicker2" data-event="colorChangeEvent2" value="#33ff57">
+              <input type="color" class="color-picker" id="colorPicker2" data-event="colorChangeEvent2" value="ff820f">
               <span>Light</span>
              
           </div>
 
           <!-- Third Color -->
           <div class="color-option">
-              <button class="color-btn" id="colorWood" data-color="#3357ff" style="background: #885426;"></button>
-              <input type="color" class="color-picker" id="colorPicker3" data-event="colorChangeEvent3" value="#3357ff">
+              <button class="color-btn" id="colorWood" data-color="#885426" style="background: #885426;"></button>
+              <input type="color" class="color-picker" id="colorPicker3" data-event="colorChangeEvent3" value="#885426">
               <span>Lamp</span>
           </div>
       </div>
@@ -48,33 +48,10 @@
     <canvas id="canvas" class="webgl" ></canvas>
     
     <script type="x-shader/x-vertex" id="atmosphereVertex">
-      varying vec3 vertexNormal;
-      varying vec3 vPositionNormal; 
 
-      void main()
-      {
-          vertexNormal = normalize(normalMatrix * normal);
-          vPositionNormal = normalize(( modelViewMatrix * vec4(position, 1.0) ).xyz);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
-      }
   </script>
   <script type="x-shader/x-fragment" id="atmosphereFragment">
-    varying vec3 vertexNormal;
-    varying vec3 vPositionNormal;
-    uniform vec4 uColor; 
-    uniform float glowStrength; // Adjust glow intensity dynamically
-
-    void main()
-    {
-      // Compute intensity based on dot product (directional fading effect)
-      float intensity = pow(abs(dot(normalize(vertexNormal), normalize(vPositionNormal))), 3.0); 
-
-      // Smoothly transition intensity for better glow effect
-      intensity = smoothstep(0.0, 1.0, intensity) * glowStrength;
-
-      // Output color with adjusted glow
-      gl_FragColor = uColor * intensity;
-    }  
+    
   </script>
   <!-- <script type="x-shader/x-fragment" id="atmosphereFragment">
       varying vec3 vertexNormal;
@@ -123,7 +100,6 @@
       document.getElementById("toggleButton").addEventListener("click", function() {
           isToggled = !isToggled;
           this.textContent = isToggled ? "Light Off" : "Light On";
-          console.log("Toggle Button State:", isToggled);
           document.dispatchEvent(new CustomEvent("toggleButtonEvent", { detail: isToggled }));
       })
 

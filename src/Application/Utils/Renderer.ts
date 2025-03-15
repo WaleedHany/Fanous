@@ -1,222 +1,193 @@
-import {CineonToneMapping, Scene, WebGLRenderer/*, PCFSoftShadowMap, CineonToneMapping, Vector2, Color*/} from 'three'
+import {
+    Scene, WebGLRenderer, WebGLRenderTarget, HalfFloatType,
+    ACESFilmicToneMapping,
+    SRGBColorSpace,
+    RGBAFormat,
+} from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
+
 import Viewer from '../Viewer'
 import Camera from './Camera'
 import SceneSizes from './SceneSizes'
+import { ClearPass } from 'three/examples/jsm/Addons.js'
 
-export default class Renderer
-{
-    instance:WebGLRenderer|any
-    canvas : HTMLCanvasElement
-    sizes : SceneSizes
-    scene :Scene
+export default class Renderer {
+    instance: WebGLRenderer | any
+    canvas: HTMLCanvasElement
+    sizes: SceneSizes
+    scene: Scene
     application
-    camera : Camera
+    camera: Camera
+    composer: EffectComposer|any  // Add EffectComposer
 
-    constructor(canvas:HTMLCanvasElement, sizes:SceneSizes, scene:Scene, application:Viewer, camera:Camera)
-    {
+    constructor(canvas: HTMLCanvasElement, sizes: SceneSizes, scene: Scene, application: Viewer, camera: Camera) {
         this.canvas = canvas
         this.sizes = sizes
         this.scene = scene
         this.application = application
         this.camera = camera
         this.setInstance()
+        this.setPostProcessing() // Setup EffectComposer
     }
 
-    setInstance()
-    {
+    setInstance() {
         this.instance = new WebGLRenderer({
             canvas: this.canvas,
             antialias: true,
-            alpha: true,
+            alpha: true, preserveDrawingBuffer: true   // Keep background transparency
         })
-        this.instance.toneMapping =  CineonToneMapping
-        this.instance.toneMappingExposure = 1
+        this.instance.toneMapping = ACESFilmicToneMapping
+        this.instance.toneMappingExposure = 0.8
         this.instance.setSize(this.sizes.width, this.sizes.height)
         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1))
         this.instance.autoClear = false
+        this.instance.setClearColor(0x000000, 0)  // Ensure transparency
+        this.instance.domElement.style.background = "none";
+        this.instance.outputEncoding = SRGBColorSpace
     }
 
-    resize()
-    {
+    setPostProcessing() {
+        const renderTarget = new WebGLRenderTarget(this.sizes.width, this.sizes.height, {
+            type: HalfFloatType,
+            format: RGBAFormat,
+            colorSpace: SRGBColorSpace, 
+        })
+        renderTarget.samples = 8
+
+        this.composer = new EffectComposer(this.instance, renderTarget)
+    
+        const clearPass = new ClearPass()
+        this.composer.addPass(clearPass)
+
+        this.composer.addPass(new RenderPass(this.scene, this.camera.instance))
+        const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader)
+        this.composer.addPass(gammaCorrectionPass)
+
+        // Add Bloom Effect
+        const bloomPass = new UnrealBloomPass(undefined!, 0.2,4, 0.6)
+        this.composer.addPass(bloomPass)
+    }
+
+    resize() {
         this.instance.setSize(this.sizes.width, this.sizes.height)
+        this.composer.setSize(this.sizes.width, this.sizes.height) // Update composer size
         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1))
         this.application.cameraList.forEach(c => c.instance.updateProjectionMatrix())
     }
 
-    update()
-    {
-        if (this.application.cameraList.length == 1 && !this.application.allowAxisScene)
-        {
-            this.instance.setScissorTest (false)
-            this.instance.render(this.scene, this.camera.instance)
-        }
-        else {
+    update() {
+        if (this.application.cameraList.length === 1 && !this.application.allowAxisScene) {
+            this.instance.setScissorTest(false)
+            this.composer.render()  // Use EffectComposer instead of instance.render()
+        } else {
             this.instance.setScissorTest(true)
-            this.instance.setViewport (
+            this.instance.setViewport(
                 0, 0,
-                this.sizes.height*0.2,
-                this.sizes.height*0.2 )
+                this.sizes.height * 0.2,
+                this.sizes.height * 0.2
+            )
             this.instance.setScissor(
                 0, 0,
-                this.sizes.height*0.2 ,
-                this.sizes.height*0.2 
+                this.sizes.height * 0.2,
+                this.sizes.height * 0.2
             )
             this.application.axisCamera.updateProjectionMatrix()
             this.instance.render(this.application.axisScene, this.application.axisCamera)
-            // for (const camera of this.application.cameraList)
-            // {        
-                let left = (this.camera.x * this.sizes.width)
-                let bottom = this.sizes.height - ((this.camera.heightRatio * this.sizes.height) + (this.camera.y * this.sizes.height))
-                let width = this.camera.widthRatio * this.sizes.width
-                let height = this.camera.heightRatio * this.sizes.height
-                this.instance.setViewport (left,bottom,width,height)
-                this.instance.setScissor(left,bottom,width,height)
-                this.camera.instance.updateProjectionMatrix()
-                this.instance.render (this.scene, this.camera.instance)
-            //}
+
+            let left = this.camera.x * this.sizes.width
+            let bottom = this.sizes.height - ((this.camera.heightRatio * this.sizes.height) + (this.camera.y * this.sizes.height))
+            let width = this.camera.widthRatio * this.sizes.width
+            let height = this.camera.heightRatio * this.sizes.height
+            this.instance.setViewport(left, bottom, width, height)
+            this.instance.setScissor(left, bottom, width, height)
+            this.camera.instance.updateProjectionMatrix()
+
+            // Render with post-processing for the main scene
+            this.composer.render()
         }
     }
 }
-// import { 
-//     Scene, WebGLRenderer, Vector2, MeshBasicMaterial, Layers, ShaderMaterial, Color,
-//     ReinhardToneMapping,
-//     WebGLRenderTarget,
-//     RGBAFormat,
-//     DepthTexture,
-//     UnsignedShortType
-// } from 'three' 
-// import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js' 
-// import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js' 
-// import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js' 
-// import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js' 
-// import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js' 
-// import Viewer from '../Viewer' 
-// import Camera from './Camera' 
+
+// import {CineonToneMapping, Scene, WebGLRenderer/*, PCFSoftShadowMap, CineonToneMapping, Vector2, Color*/} from 'three'
+// import Viewer from '../Viewer'
+// import Camera from './Camera'
 // import SceneSizes from './SceneSizes'
-// const materials:any = {}
-// const depthTexture = new DepthTexture(1,1);
-// depthTexture.type = UnsignedShortType;
-// export default class Renderer {
-//     instance: WebGLRenderer|any
-//     canvas: HTMLCanvasElement 
-//     sizes: SceneSizes 
-//     scene: Scene 
-//     application: Viewer 
-//     camera: Camera 
 
-//     BLOOM_SCENE = 1 
-//     composer: EffectComposer|any
-//     bloomComposer: EffectComposer|any
-//     bloomPass: UnrealBloomPass|any
-//     outputPass: OutputPass|any
-//     mixPass: ShaderPass|any
-//     finalComposer: EffectComposer|any
-//     darkMaterial: MeshBasicMaterial = new MeshBasicMaterial({ color: 0x000000 }) 
-//     bloomLayer :Layers|any
-    
+// export default class Renderer
+// {
+//     instance:WebGLRenderer|any
+//     canvas : HTMLCanvasElement
+//     sizes : SceneSizes
+//     scene :Scene
+//     application
+//     camera : Camera
 
-//     constructor(canvas: HTMLCanvasElement, sizes: SceneSizes, scene: Scene, application: Viewer, camera: Camera) {
-//         this.canvas = canvas 
-//         this.sizes = sizes 
-//         this.scene = scene 
-//         this.application = application 
-//         this.camera = camera 
-//         this.setInstance() 
-//         this.setPostProcessing() 
+//     constructor(canvas:HTMLCanvasElement, sizes:SceneSizes, scene:Scene, application:Viewer, camera:Camera)
+//     {
+//         this.canvas = canvas
+//         this.sizes = sizes
+//         this.scene = scene
+//         this.application = application
+//         this.camera = camera
+//         this.setInstance()
 //     }
 
-//     setInstance() {
+//     setInstance()
+//     {
 //         this.instance = new WebGLRenderer({
 //             canvas: this.canvas,
 //             antialias: true,
 //             alpha: true,
-//         }) 
-
-//         this.instance.setSize(this.sizes.width, this.sizes.height) 
-//         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1)) 
-//         this.instance.autoClear = false 
+//         })
+//         this.instance.toneMapping =  CineonToneMapping
+//         this.instance.toneMappingExposure = 1.3
+//         this.instance.setSize(this.sizes.width, this.sizes.height)
+//         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1))
+//         this.instance.autoClear = false
 //     }
 
-//     resize() {
-//         this.instance.setSize(this.sizes.width, this.sizes.height) 
-//         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1)) 
-//         this.application.cameraList.forEach(c => c.instance.updateProjectionMatrix()) 
-//         this.bloomComposer.setSize(this.sizes.width, this.sizes.height) 
-//         this.finalComposer.setSize(this.sizes.width, this.sizes.height) 
+//     resize()
+//     {
+//         this.instance.setSize(this.sizes.width, this.sizes.height)
+//         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1))
+//         this.application.cameraList.forEach(c => c.instance.updateProjectionMatrix())
 //     }
 
-//     setPostProcessing() {
-//         this.instance.toneMapping = ReinhardToneMapping;
-//         const renderScene = new RenderPass(this.scene, this.camera.instance) 
-        
-//         this.bloomPass = new UnrealBloomPass(new Vector2(this.sizes.width, this.sizes.height), 1, 0.2, 0.1) 
-//         this.bloomPass.threshold = 0 
-//         this.bloomPass.strength = 0.6
-//         this.bloomPass.radius = 0.3
-
-//         const bloomRenderTarget = new WebGLRenderTarget(this.sizes.width, this.sizes.height, {
-//             format: RGBAFormat,
-//             depthTexture: depthTexture,
-//             depthBuffer: true
-//         });
-//         this.bloomComposer = new EffectComposer(this.instance, bloomRenderTarget) 
-//         this.bloomComposer.renderToScreen = false;
-//         this.bloomComposer.addPass(renderScene) 
-//         this.bloomComposer.addPass(this.bloomPass)
-//             const vertexShader = document.getElementById('vertexshader')?.textContent! 
-//             const fragmentShader = document.getElementById('fragmentshader')?.textContent! 
-
-//             this.mixPass = new ShaderPass(
-//                 new ShaderMaterial({
-//                     uniforms: {
-//                         baseTexture: { value: null },
-//                         bloomTexture: { value: this.bloomComposer.renderTarget2.texture },
-//                         depthTexture: { value: depthTexture } 
-//                     },
-//                     vertexShader,
-//                     fragmentShader,
-//                 }),
-//                 'baseTexture'
-//             ) 
-//             this.mixPass.needsSwap = true;
-
-//             this.outputPass = new OutputPass() 
-//             this.finalComposer = new EffectComposer(this.instance) 
-//             this.finalComposer.addPass(renderScene) 
-//             this.finalComposer.addPass(this.mixPass) 
-//             this.finalComposer.addPass(this.outputPass)
-
-//             this.bloomLayer = new Layers()
-//             this.bloomLayer.set(this.BLOOM_SCENE) 
-//     }
-
-//     update() {
-//         this.scene.traverse(this.darkenNonBloomed.bind(this))
-
-//         this.bloomComposer.render()
-
-//         this.scene.traverse(this.restoreMaterial.bind(this))
-
-//        this.finalComposer.render()
-//     }
-
-
-//     darkenNonBloomed( obj:any ) {
-//         if ( obj.isMesh && !obj.layers.test(this.bloomLayer) && obj.userData.isEmmisive != true) {
-//             if (!(obj.material instanceof MeshBasicMaterial)) {
-//                 materials[ obj.uuid ] = obj.material
-//                 obj.material = this.darkMaterial 
-//             }
+//     update()
+//     {
+//         if (this.application.cameraList.length == 1 && !this.application.allowAxisScene)
+//         {
+//             this.instance.setScissorTest (false)
+//             this.instance.render(this.scene, this.camera.instance)
 //         }
-
-//     }
-
-//     restoreMaterial( obj:any ) {
-
-//         if ( materials[ obj.uuid ] ) {
-
-//             obj.material = materials[ obj.uuid ] 
-//             delete materials[ obj.uuid ] 
+//         else {
+//             this.instance.setScissorTest(true)
+//             this.instance.setViewport (
+//                 0, 0,
+//                 this.sizes.height*0.2,
+//                 this.sizes.height*0.2 )
+//             this.instance.setScissor(
+//                 0, 0,
+//                 this.sizes.height*0.2 ,
+//                 this.sizes.height*0.2 
+//             )
+//             this.application.axisCamera.updateProjectionMatrix()
+//             this.instance.render(this.application.axisScene, this.application.axisCamera)
+//             // for (const camera of this.application.cameraList)
+//             // {        
+//                 let left = (this.camera.x * this.sizes.width)
+//                 let bottom = this.sizes.height - ((this.camera.heightRatio * this.sizes.height) + (this.camera.y * this.sizes.height))
+//                 let width = this.camera.widthRatio * this.sizes.width
+//                 let height = this.camera.heightRatio * this.sizes.height
+//                 this.instance.setViewport (left,bottom,width,height)
+//                 this.instance.setScissor(left,bottom,width,height)
+//                 this.camera.instance.updateProjectionMatrix()
+//                 this.instance.render (this.scene, this.camera.instance)
+//             //}
 //         }
 //     }
 // }

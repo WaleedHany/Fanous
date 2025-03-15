@@ -10,8 +10,10 @@ import LanternNeck from "./lanternNeck"
 import Renderer from "../Utils/Renderer"
 import Rotations from "../Geomtry/Rotations"
 import lanternTop2Head from "./LanternTop2Head"
+// import vertex from "../Shaders/vertex.glsl"
+// import fragment from "../Shaders/fragment.glsl"
 
-let headMaterial :THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.FrontSide, roughness:0.5, metalness:0.8, reflectivity:0.2 , depthTest:true, transparent:true}) //0x774315 //0x45D6D2
+let hangerMaterial :THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.FrontSide, roughness:0.5, metalness:0.8, reflectivity:0.2 , depthTest:true, transparent:true}) //0x774315 //0x45D6D2
 let material:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35 }) //0x774315 //0x45D6D2
 let footerMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let bottomDomeMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
@@ -23,7 +25,7 @@ let lampOnMaterial = new THREE.MeshPhysicalMaterial({
   metalness: .5,
   roughness: 0.0,
   envMapIntensity: 1,
-  clearcoat: 1, color:0xff9f1a, // 0xffbe33, //new THREE.Color(1.0, 0.75, 0.1),
+  clearcoat: 1, color:0xff820f, // 0xffbe33, //new THREE.Color(1.0, 0.75, 0.1),
   transparent: true,
   opacity: .5,
   reflectivity: 1,
@@ -53,10 +55,10 @@ export default class LanternParts{
     edge:LanternPart|any
     glow:THREE.Mesh|any
     glow2:THREE.Mesh|any
-
+    hangerRing:THREE.Mesh|any
     object:THREE.Mesh|any
     textureLoader:THREE.TextureLoader
-  ornaments: THREE.Mesh|any
+    ornaments: THREE.Mesh|any
 
     constructor(renderer: Renderer) { 
       this.textureLoader = new THREE.TextureLoader()
@@ -125,8 +127,6 @@ export default class LanternParts{
           ornamentMaterial.map = ornamentMaterialTexture
           ornamentMaterial.bumpMap = ornamentMaterialBump
           ornamentMaterial.alphaMap = ornamentMaterialBump
-          ornamentMaterial.transparent= true
-
           // ornamentMaterial2 = material.clone()
           // GlassPatternTexture.wrapS = THREE.RepeatWrapping
           // GlassPatternTexture.wrapT = THREE.RepeatWrapping
@@ -151,16 +151,16 @@ export default class LanternParts{
       return new Promise((resolve, reject) => {
           this.textureLoader.load(
               path,
-              texture => resolve(texture), // On success, resolve the texture
+              texture => resolve(texture),
               undefined,
-              error => reject(error) // On error, reject the promise
+              error => reject(error)
           )
       })
   }
 
   createLanternObjects(renderer: Renderer) {
     this.TopDome = this.loadPointsFromSring(LanternTop2.object)
-    this.TopDomeHead = this.loadPointsFromSring(lanternTop2Head.object, headMaterial)
+    this.TopDomeHead = this.loadPointsFromSring(lanternTop2Head.object, hangerMaterial)
     this.TopDomeNeck = this.loadPointsFromSring(LanternNeck.object, neckMaterial)
     this.TopDomeBase = this.loadPointsFromSring(lanternTopFooter.object, footerMaterial)
     this.MidLamp = this.loadPointsFromSring(LanternMid.object, lampOnMaterial)
@@ -176,28 +176,35 @@ export default class LanternParts{
     //#region MidLamp
     this.MidLamp.object.position.y += this.MidLamp.height
     this.MidLamp.object.renderOrder = 0
-    this.glow = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width / 2),  new THREE.ShaderMaterial({
-      vertexShader: document.getElementById("atmosphereVertex")?.textContent!,
-      fragmentShader: document.getElementById("atmosphereFragment")?.textContent!,
-      uniforms: {
-        uColor: { value: new THREE.Vector4(1.0, 0.75, 0.1, 0.4) },
-        glowStrength: { value: 2.2 },
-      },
-      blending: THREE.AdditiveBlending, opacity:0.15, depthTest:false,
-      side: THREE.BackSide        
-  }))
-  this.glow2 = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width / 2.8),  new THREE.ShaderMaterial({
-    vertexShader: document.getElementById("atmosphereVertex")?.textContent!,
-    fragmentShader: document.getElementById("atmosphereFragment")?.textContent!,
-    uniforms: {
-      uColor: { value: new THREE.Vector4(1.0, 0.95, 0.4, 0.4) },
-      glowStrength: { value: 1.1},
-    },
-    blending: THREE.AdditiveBlending, opacity:0.3, depthTest:false,
-    side: THREE.BackSide        
-}))
-  this.glow.scale.set(1.5,1.3,1.5)
-  this.glow.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-22,this.MidLamp.object.position.z)
+    this.glow = new THREE.Mesh(this.MidLamp.object.geometry.clone(), new THREE.MeshStandardMaterial({color:0xff820f, emissive:0xff820f, emissiveIntensity:2}) )
+    //new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width / 2)
+  //   new THREE.ShaderMaterial({
+  //     vertexShader: vertex,
+  //     fragmentShader: fragment,
+  //     uniforms: {
+  //       uColor: { value: new THREE.Vector4(1.0, 0.75, 0.1, 0.4) },
+  //       glowStrength: { value: 2.4 },
+  //       fadeDegree: { value: 3 },
+  //     },
+  //     blending: THREE.AdditiveBlending, opacity:0.15, depthTest:false,
+  //     side: THREE.BackSide        
+  // })
+
+//   this.glow2 = new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width / 2.8),  new THREE.ShaderMaterial({
+//     vertexShader: vertex,
+//     fragmentShader: fragment,
+//     uniforms: {
+//       uColor: { value: new THREE.Vector4(1.0, 0.95, 0.4, 0.4) },
+//       glowStrength: { value: 1.1},
+//       fadeDegree: { value: 4 },
+//     },
+//     blending: THREE.AdditiveBlending, opacity:0.3, depthTest:false,
+//     side: THREE.BackSide        
+// }))
+
+ // this.glow.scale.set(1.5,1.4,1.5)
+ //this.glow.scale.set(0.9,0.9,0.9)
+  this.glow.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y,this.MidLamp.object.position.z)
   this.glow2.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y-42,this.MidLamp.object.position.z)
   const light=new THREE.PointLight()
   light.intensity=5
@@ -205,15 +212,16 @@ export default class LanternParts{
 
   this.ornaments = new THREE.Mesh(this.MidLamp.geometry, ornamentMaterial)
   this.ornaments.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y,this.MidLamp.object.position.z)
+  this.ornaments.renderOrder=1
   //#endregion // MidLamp
   this.object = new THREE.Mesh()
 
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(4,0.8, 3), headMaterial)
-  ring.position.set(this.TopDome.object.position.x,this.TopDome.object.position.y+4,this.TopDome.object.position.z)
-  ring.renderOrder = 1
+  this.hangerRing = new THREE.Mesh(new THREE.TorusGeometry(4,0.8, 3), hangerMaterial)
+  this.hangerRing.position.set(this.TopDome.object.position.x,this.TopDome.object.position.y+4,this.TopDome.object.position.z)
+  this.hangerRing.renderOrder = 1
 
-     this.object.add(ring, this.TopDome.object, this.TopDomeNeck.object, this.TopDomeBase.object,this.MidLamp.object,
-                   this.BottomDomeBase.object, this.BottomDome.object, this.glow, this.glow2 ,light) //, ornaments,, this.TopDomeHead.object
+     this.object.add(this.hangerRing, this.TopDome.object, this.TopDomeNeck.object, this.TopDomeBase.object,this.MidLamp.object,
+                   this.BottomDomeBase.object, this.BottomDome.object, this.glow, light) //, ornaments,, this.TopDomeHead.object,this.glow2 ,
 
     for(let edge of edges){
       edge.object.position.y += edge.height
@@ -351,9 +359,10 @@ export default class LanternParts{
     }
 
     changeLampColor(color:THREE.Color){
-      this.glow.material.uniforms.uColor.value.set(color.r, color.g, color.b, 0.4)
-      this.glow2.material.uniforms.uColor.value.set(color.r, color.g, color.b, 0.4)
+      //this.glow.material.uniforms.uColor.value.set(color.r, color.g, color.b, 0.4)
+      //this.glow2.material.uniforms.uColor.value.set(color.r, color.g, color.b, 0.4)
       this.MidLamp.object.material.color = color
+      this.glow.material = new THREE.MeshStandardMaterial({color:color, emissive:color, emissiveIntensity:8})
     }
     changeWoodColor(color:THREE.Color){
       material.color = color
@@ -361,15 +370,16 @@ export default class LanternParts{
       bottomDomeMaterial.color = color
       footerMaterial.color = color
       ornamentMaterial.color = color
+      hangerMaterial.color = color
     }
     ToggleLight(light:boolean){
       if(!light){
         this.MidLamp.object.material = lampOffMaterial
-        this.object.remove(this.glow, this.glow2)
+        this.object.remove(this.glow)
       } 
       else{
         this.MidLamp.object.material = lampOnMaterial
-        this.object.add(this.glow, this.glow2)
+        this.object.add(this.glow)
       }
     }
 

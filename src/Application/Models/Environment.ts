@@ -9,6 +9,7 @@ export default class Environment
     moon:THREE.Mesh|any
     textureLoader: THREE.TextureLoader
     camera:Camera
+    background:THREE.Texture|any
     constructor(scene:THREE.Scene, camera:Camera)
     {
         THREE.Object3D.DEFAULT_UP.set(0,0,1)
@@ -17,7 +18,7 @@ export default class Environment
         // Setup
         this.textureLoader = new THREE.TextureLoader()
         this.setSunLight()
-        this.setMoon()
+        this.setbackground()
     }
 
     setSunLight()
@@ -27,33 +28,40 @@ export default class Environment
         let sunLight2 =new THREE.DirectionalLight(0xffffaa, 6)
         sunLight2.color = new THREE.Color(0xffffff)
         sunLight2.position.set(40, 60, 20)
-        this.ambientLight = new THREE.AmbientLight(0xffbbaa,4)
-        const ambientLight = new THREE.AmbientLight(0xffbbaa,6)
+        this.ambientLight = new THREE.AmbientLight(0xffbbaa,2)
+        const ambientLight = new THREE.AmbientLight(0xffbbaa,3)
         this.scene.add(this.sunLight, sunLight2, this.ambientLight,ambientLight)
     }
-    setMoon(){
-        this.loadTexture(`${import.meta.env.BASE_URL}Assets/Images/Moon1.jpg`, (moonTexture) => {
+    setbackground(){
+        Promise.all([
+        this.loadTexture(`${import.meta.env.BASE_URL}Assets/Images/Moon3.jpg`),
+        this.loadTexture(`${import.meta.env.BASE_URL}Assets/Images/gradient_background.png`)
+        ]).then(([moonTexture, backgroundTexture]) => {
             let moonMaterial = new THREE.SpriteMaterial({
-                        map:moonTexture, alphaMap:moonTexture, rotation: Math.PI / 4
+                        map:moonTexture, alphaMap:moonTexture, rotation: -3*Math.PI/4
                         });
             this.moon = new THREE.Sprite( moonMaterial )
             this.moon.position.set( -1500, 100, 120)
             this. moon.scale.set(40, 40, 1)
             this.scene.add(this.moon)
-      })
+
+            backgroundTexture.colorSpace = THREE.SRGBColorSpace;  // ✅ Fix faded colors
+            //backgroundTexture.encoding //= THREE.LinearSRGBColorSpace;   // ✅ Prevents double correction
+            backgroundTexture.needsUpdate = true;
+            this.background = backgroundTexture
+            this.scene.background = this.background
+        })
     }
 
-    loadTexture(path: string, callback: (texture: THREE.Texture) => void) {
-        this.textureLoader.load(
-            path,
-            (texture) => {
-                callback(texture);
-            },
-            undefined,
-            (error) => {
-                console.error(`Failed to load texture: ${path}`, error);
-            }
-        );
-    }
+      loadTexture(path: string): Promise<THREE.Texture> {
+          return new Promise((resolve, reject) => {
+              this.textureLoader.load(
+                  path,
+                  texture => resolve(texture),
+                  undefined,
+                  error => reject(error)
+              )
+          })
+      }
 
 }

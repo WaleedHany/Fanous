@@ -129,8 +129,8 @@ export default class Viewer {
       this.renderer.update()
       if(this.camera?.instance?.position != null && this.environment.moon != null)
       {  
-        let scale = this.camera?.instance?.position?.sub(this.environment.moon?.position)?.length()/18
-        this.environment.moon?.scale.set(1.3*scale,scale,1)
+        let scale = this.camera?.instance?.position?.sub(this.environment.moon?.position)?.length()/16
+        this.environment.moon?.scale.set(scale,scale,scale)
         let target
         (this.camera?.controls as CameraControls).getTarget(target= new THREE.Vector3(), true)
         let dot = target.clone().sub(this.camera?.instance?.position).normalize()
