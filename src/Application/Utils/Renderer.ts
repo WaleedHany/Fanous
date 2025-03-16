@@ -4,6 +4,7 @@ import {
     SRGBColorSpace,
     RGBAFormat,
     LinearSRGBColorSpace,
+    Vector2,
 } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -24,6 +25,7 @@ export default class Renderer {
     application
     camera: Camera
     composer: EffectComposer|any  // Add EffectComposer
+    bloomPass: UnrealBloomPass|any
 
     constructor(canvas: HTMLCanvasElement, sizes: SceneSizes, scene: Scene, application: Viewer, camera: Camera) {
         this.canvas = canvas
@@ -42,7 +44,7 @@ export default class Renderer {
             alpha: true, preserveDrawingBuffer: true   // Keep background transparency
         })
         this.instance.toneMapping = ACESFilmicToneMapping
-        this.instance.toneMappingExposure = 0.8
+        this.instance.toneMappingExposure = 0.75
         this.instance.setSize(this.sizes.width, this.sizes.height)
         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1))
         this.instance.autoClear = false
@@ -69,8 +71,8 @@ export default class Renderer {
         this.composer.addPass(gammaCorrectionPass)
 
         // Add Bloom Effect
-        const bloomPass = new UnrealBloomPass(undefined!, 0.2,4, 0.6)
-        this.composer.addPass(bloomPass)
+        this.bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.22,4.3, 0.6)
+        this.composer.addPass(this.bloomPass)
     }
 
     resize() {
@@ -109,6 +111,9 @@ export default class Renderer {
             this.composer.render()
             this.instance.setScissorTest(false);
         }
+        // let distance = this.camera.instance.position.length()
+        // if(distance > 500)this.bloomPass.radius = distance/20
+        // else this.bloomPass.radius = 4.2
     }
 }
 

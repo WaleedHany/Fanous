@@ -4,7 +4,7 @@ import Camera from '../Utils/Camera'
 export default class Environment
 {
     scene:THREE.Scene
-    sunLight:THREE.DirectionalLight = new THREE.DirectionalLight(0xffffff, 8)
+    sunLight:THREE.DirectionalLight = new THREE.DirectionalLight(0xffffff, 14)
     ambientLight: THREE.AmbientLight|any
     moon:THREE.Mesh|any
     textureLoader: THREE.TextureLoader
@@ -25,10 +25,10 @@ export default class Environment
     {
         this.sunLight.color = new THREE.Color(0xffbbaa)
         this.sunLight.position.set(-40, 40, 20)
-        let sunLight2 =new THREE.DirectionalLight(0xffffaa, 6)
+        let sunLight2 =new THREE.DirectionalLight(0xffffaa, 1)
         sunLight2.color = new THREE.Color(0xffffff)
-        sunLight2.position.set(40, 60, 20)
-        this.ambientLight = new THREE.AmbientLight(0xffbbaa,2)
+        sunLight2.position.set(140, 160, 20)
+        this.ambientLight = new THREE.AmbientLight(0xffbbaa,3)
         const ambientLight = new THREE.AmbientLight(0xffbbaa,3)
         this.scene.add(this.sunLight, sunLight2, this.ambientLight,ambientLight)
     }

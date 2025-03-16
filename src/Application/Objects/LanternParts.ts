@@ -7,7 +7,6 @@ import LanternBottomTop from "./lanternBottonTop"
 import LanternMid from "./lanternMid"
 import lanternTopFooter from "./lanternTopFooter"
 import LanternNeck from "./lanternNeck"
-import Renderer from "../Utils/Renderer"
 import Rotations from "../Geomtry/Rotations"
 import lanternTop2Head from "./LanternTop2Head"
 // import vertex from "../Shaders/vertex.glsl"
@@ -60,7 +59,7 @@ export default class LanternParts{
     textureLoader:THREE.TextureLoader
     ornaments: THREE.Mesh|any
 
-    constructor(renderer: Renderer) { 
+    constructor(scene: THREE.Scene) { 
       this.textureLoader = new THREE.TextureLoader()
   
       // Load textures asynchronously
@@ -142,7 +141,7 @@ export default class LanternParts{
           // ornamentMaterial2.alphaMap = ornamentMaterialBump2
           // ornamentMaterial2.transparent= true
 
-          this.createLanternObjects(renderer)
+          this.createLanternObjects(scene)
       }).catch(error => {
           console.error("Error loading textures:", error)
       })
@@ -158,7 +157,7 @@ export default class LanternParts{
       })
   }
 
-  createLanternObjects(renderer: Renderer) {
+  createLanternObjects(scene: THREE.Scene) {
     this.TopDome = this.loadPointsFromSring(LanternTop2.object)
     this.TopDomeHead = this.loadPointsFromSring(lanternTop2Head.object, hangerMaterial)
     this.TopDomeNeck = this.loadPointsFromSring(LanternNeck.object, neckMaterial)
@@ -176,7 +175,7 @@ export default class LanternParts{
     //#region MidLamp
     this.MidLamp.object.position.y += this.MidLamp.height
     this.MidLamp.object.renderOrder = 0
-    this.glow = new THREE.Mesh(this.MidLamp.object.geometry.clone(), new THREE.MeshStandardMaterial({color:0xff820f, emissive:0xff820f, emissiveIntensity:2}) )
+    this.glow = new THREE.Mesh(this.MidLamp.object.geometry.clone(), new THREE.MeshStandardMaterial({color:0xff820f, emissive:0xff820f, emissiveIntensity:5, side:THREE.DoubleSide}) )
     //new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width / 2)
   //   new THREE.ShaderMaterial({
   //     vertexShader: vertex,
@@ -220,7 +219,7 @@ export default class LanternParts{
   this.hangerRing.position.set(this.TopDome.object.position.x,this.TopDome.object.position.y+4,this.TopDome.object.position.z)
   this.hangerRing.renderOrder = 1
 
-     this.object.add(this.hangerRing, this.TopDome.object, this.TopDomeNeck.object, this.TopDomeBase.object,this.MidLamp.object,
+     this.object.add(this.hangerRing, this.TopDome.object, this.TopDomeNeck.object, this.TopDomeBase.object,  this.MidLamp.object,
                    this.BottomDomeBase.object, this.BottomDome.object, this.glow, light) //, ornaments,, this.TopDomeHead.object,this.glow2 ,
 
     for(let edge of edges){
@@ -228,7 +227,8 @@ export default class LanternParts{
         edge.object.position.x += 0.5
        this.object.add(edge.object)
      }
-    renderer.scene.add(this.object)
+     this.object.rotation.y = 22/21
+    scene.add(this.object)
   }
 
 
@@ -282,7 +282,8 @@ export default class LanternParts{
             {
               if(angle == 0) points.points[j][k].x -= this.MidLamp.width/2 - points.width/4.1
               let point = points.points[j][k]
-              if(angle!=0) point = Rotations.rotatePointAboutArbitraryAxisPassingThroughAPoint( points.points[j][k], angle, new THREE.Vector3(0,1,0), new THREE.Vector3(this.MidLamp.avgX,0,0))
+              if(angle!=0) point = Rotations.rotatePointAboutArbitraryAxisPassingThroughAPoint( 
+                points.points[j][k], angle, new THREE.Vector3(0,1,0), new THREE.Vector3(this.MidLamp.avgX,0,0))
               contourPoints.push(point.x)
               contourPoints.push(point.y)
               contourPoints.push(point.z)
@@ -361,7 +362,8 @@ export default class LanternParts{
       //this.glow.material.uniforms.uColor.value.set(color.r, color.g, color.b, 0.4)
       //this.glow2.material.uniforms.uColor.value.set(color.r, color.g, color.b, 0.4)
       this.MidLamp.object.material.color = color
-      this.glow.material = new THREE.MeshStandardMaterial({color:color, emissive:color, emissiveIntensity:8})
+      this.glow.material.color = color
+      this.glow.material.emissive = color
     }
     changeWoodColor(color:THREE.Color){
       material.color = color
@@ -385,5 +387,9 @@ export default class LanternParts{
     Addornaments(addornaments:boolean){
       if(addornaments) this.object.add(this.ornaments)
       else this.object.remove(this.ornaments)
+    }
+
+    updateLightIntensity(intensity:number){
+      this.glow.material.emissiveIntensity = intensity
     }
 }
