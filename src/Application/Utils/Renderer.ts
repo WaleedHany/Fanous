@@ -44,7 +44,7 @@ export default class Renderer {
             alpha: true, preserveDrawingBuffer: true   // Keep background transparency
         })
         this.instance.toneMapping = ACESFilmicToneMapping
-        this.instance.toneMappingExposure = 0.75
+        this.instance.toneMappingExposure = 0.95
         this.instance.setSize(this.sizes.width, this.sizes.height)
         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 1))
         this.instance.autoClear = false
@@ -71,7 +71,7 @@ export default class Renderer {
         this.composer.addPass(gammaCorrectionPass)
 
         // Add Bloom Effect
-        this.bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.22,4.3, 0.6)
+        this.bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.34,2, 0.6)
         this.composer.addPass(this.bloomPass)
     }
 

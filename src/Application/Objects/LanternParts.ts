@@ -1,6 +1,5 @@
 import * as THREE from "three"
 import LanternPart from "./LanternPart"
-import LanternTop2 from "./lanternTop2"
 import LanternBottom from "./LanternBottom"
 import Lanternedge from "./edge"
 import LanternBottomTop from "./lanternBottonTop"
@@ -9,6 +8,7 @@ import lanternTopFooter from "./lanternTopFooter"
 import LanternNeck from "./lanternNeck"
 import Rotations from "../Geomtry/Rotations"
 import lanternTop2Head from "./LanternTop2Head"
+import LanternTop from "./lanternTop"
 // import vertex from "../Shaders/vertex.glsl"
 // import fragment from "../Shaders/fragment.glsl"
 
@@ -17,19 +17,19 @@ let material:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color
 let footerMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let bottomDomeMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let neckMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
-let ornamentMaterial:THREE.MeshPhysicalMaterial
-//let ornamentMaterial2:THREE.MeshPhysicalMaterial
+let ornamentMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:1, metalness:0.1, reflectivity:0.1, transparent:true, })
+let ornamentMaterial2:THREE.MeshPhysicalMaterial
 
 let lampOnMaterial = new THREE.MeshPhysicalMaterial({
-  metalness: .5,
+  metalness: .3,
   roughness: 0.0,
   envMapIntensity: 1,
   clearcoat: 1, color:0xff820f, // 0xffbe33, //new THREE.Color(1.0, 0.75, 0.1),
   transparent: true,
   opacity: .5,
-  reflectivity: 1,
-  ior: 0.9,
-  side: THREE.BackSide,
+  reflectivity: 0.0,
+  ior: 0.0,
+  side: THREE.FrontSide,
 })
 
 let lampOffMaterial = new THREE.MeshPhysicalMaterial({
@@ -66,8 +66,9 @@ export default class LanternParts{
       Promise.all([
           this.loadTexture(`${import.meta.env.BASE_URL}Assets/Images/DomeTexture.png`),
           this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/DomeBump.png`),
+          this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/ornaments2.png`),
           // this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/GlassPattern.png`)
-      ]).then(([colorTexture, bumpTexture]) => {
+      ]).then(([colorTexture, bumpTexture, GlassPatternTexture]) => {
      
         colorTexture.wrapS = THREE.RepeatWrapping
         colorTexture.wrapT = THREE.RepeatWrapping
@@ -117,29 +118,30 @@ export default class LanternParts{
           neckMaterial.transparent = true
           neckMaterial.needsUpdate = true
           
-          ornamentMaterial = material.clone()
           const ornamentMaterialTexture = colorTexture.clone()
           const ornamentMaterialBump = bumpTexture.clone()
-          ornamentMaterialTexture.repeat.set(0.12, 0.04)
-          ornamentMaterialBump.repeat.set(0.12, 0.04)
+          ornamentMaterialTexture.repeat.set(0.06, 0.02)
+          ornamentMaterialBump.repeat.set(0.06, 0.02)
 
           ornamentMaterial.map = ornamentMaterialTexture
           ornamentMaterial.bumpMap = ornamentMaterialBump
+          ornamentMaterial.bumpScale=10
           ornamentMaterial.alphaMap = ornamentMaterialBump
-          // ornamentMaterial2 = material.clone()
-          // GlassPatternTexture.wrapS = THREE.RepeatWrapping
-          // GlassPatternTexture.wrapT = THREE.RepeatWrapping
-          // GlassPatternTexture.rotation = Math.PI
-          // const ornamentMaterialTexture2 = GlassPatternTexture
-          // const ornamentMaterialBump2 = GlassPatternTexture
-          // ornamentMaterialTexture2.repeat.set(0.118, 0.020)
-          // ornamentMaterialBump2.repeat.set(0.118, 0.020)
 
-          // ornamentMaterial2.map = ornamentMaterialTexture2
-          // ornamentMaterial2.bumpMap = ornamentMaterialBump2
-          // ornamentMaterial2.bumpScale = 40
-          // ornamentMaterial2.alphaMap = ornamentMaterialBump2
-          // ornamentMaterial2.transparent= true
+          ornamentMaterial2 = material.clone()
+          GlassPatternTexture.wrapS = THREE.RepeatWrapping
+          GlassPatternTexture.wrapT = THREE.RepeatWrapping
+          GlassPatternTexture.rotation = Math.PI
+          const ornamentMaterialTexture2 = GlassPatternTexture
+          const ornamentMaterialBump2 = GlassPatternTexture
+          ornamentMaterialTexture2.repeat.set(0.118, 0.020)
+          ornamentMaterialBump2.repeat.set(0.118, 0.020)
+
+          ornamentMaterial2.map = ornamentMaterialTexture2
+          ornamentMaterial2.bumpMap = ornamentMaterialBump2
+          ornamentMaterial2.bumpScale = 40
+          ornamentMaterial2.alphaMap = ornamentMaterialBump2
+          ornamentMaterial2.transparent= true
 
           this.createLanternObjects(scene)
       }).catch(error => {
@@ -158,7 +160,7 @@ export default class LanternParts{
   }
 
   createLanternObjects(scene: THREE.Scene) {
-    this.TopDome = this.loadPointsFromSring(LanternTop2.object)
+    this.TopDome = this.loadPointsFromSring(LanternTop.object)
     this.TopDomeHead = this.loadPointsFromSring(lanternTop2Head.object, hangerMaterial)
     this.TopDomeNeck = this.loadPointsFromSring(LanternNeck.object, neckMaterial)
     this.TopDomeBase = this.loadPointsFromSring(lanternTopFooter.object, footerMaterial)
@@ -175,7 +177,7 @@ export default class LanternParts{
     //#region MidLamp
     this.MidLamp.object.position.y += this.MidLamp.height
     this.MidLamp.object.renderOrder = 0
-    this.glow = new THREE.Mesh(this.MidLamp.object.geometry.clone(), new THREE.MeshStandardMaterial({color:0xff820f, emissive:0xff820f, emissiveIntensity:5, side:THREE.DoubleSide}) )
+    this.glow = new THREE.Mesh(this.MidLamp.object.geometry.clone(), new THREE.MeshStandardMaterial({color:0xff820f, emissive:0xff820f, emissiveIntensity:4, side:THREE.DoubleSide}) )
     //new THREE.Mesh(new THREE.SphereGeometry(this.MidLamp.width / 2)
   //   new THREE.ShaderMaterial({
   //     vertexShader: vertex,
@@ -212,6 +214,8 @@ export default class LanternParts{
   this.ornaments = new THREE.Mesh(this.MidLamp.geometry, ornamentMaterial)
   this.ornaments.position.set(this.MidLamp.object.position.x,this.MidLamp.object.position.y,this.MidLamp.object.position.z)
   this.ornaments.renderOrder=1
+  this.ornaments.add(new THREE.Mesh(this.MidLamp.geometry, ornamentMaterial),new THREE.Mesh(this.MidLamp.geometry, ornamentMaterial))
+   // ,new THREE.Mesh(this.MidLamp.geometry, ornamentMaterial)) //,new THREE.Mesh(this.MidLamp.geometry, ornamentMaterial))
   //#endregion // MidLamp
   this.object = new THREE.Mesh()
 
@@ -290,7 +294,6 @@ export default class LanternParts{
               uvs.push(j,k)
             }  
           }
-
           const uvsArray = new Float32Array(uvs)
           let indices: number[] = []
           const length = Math.floor(Math.sqrt(contourPoints.length/3))
@@ -385,7 +388,10 @@ export default class LanternParts{
     }
 
     Addornaments(addornaments:boolean){
-      if(addornaments) this.object.add(this.ornaments)
+      if(addornaments) {
+        this.object.add(this.ornaments)
+       // this.object.remove(this.)
+      }
       else this.object.remove(this.ornaments)
     }
 

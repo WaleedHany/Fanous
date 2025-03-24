@@ -40,8 +40,8 @@ export default class Camera
     {
         if (this.isPrespective)
         {
-            this.instance = new THREE.PerspectiveCamera(45, this.sizes.width / this.sizes.height, 0.1, 4000)
-            this.instance.position.set(240, 70, 120)    
+            this.instance = new THREE.PerspectiveCamera(60, this.sizes.width / this.sizes.height, 0.1, 4000)
+            this.instance.position.set(240, 40, 120)    
             this.instance.lookAt(0,-150,0)
         }
         else
@@ -210,7 +210,6 @@ export default class Camera
 export class ViewerCameras{
     mainCamera:Camera
     mainAxisCamera:THREE.OrthographicCamera|THREE.PerspectiveCamera
-    mainCamera2D:Camera
     axisCamera2D:THREE.OrthographicCamera
     axisCameraControls?:OrbitControls
     axisCamera2DControls?:OrbitControls
@@ -219,7 +218,6 @@ export class ViewerCameras{
     {
         this.mainCamera = mainCamera
         this.mainAxisCamera = this.#addMainAxisCamera(renderer)
-        this.mainCamera2D = this.#add2DCamera()
         this.axisCamera2D = this.#add2DAxisCamera(renderer)
     }
 
@@ -246,24 +244,6 @@ export class ViewerCameras{
         axisCamera.lookAt(origin)
         axisCamera.updateProjectionMatrix ()   
         return axisCamera
-    }
-
-    #add2DCamera()
-    {
-        let camera = new Camera(this.mainCamera.sizes, this.mainCamera.scene, this.mainCamera.canvas, false)
-        camera.controls.setPosition(0, 0, 1)
-        camera.controls.rotate( 22/14, 0, false )
-        camera.controls.mouseButtons.right = CameraControls.ACTION.NONE
-        return camera
-    }
-
-    set2DCamera(x:number, y:number)
-    {
-        this.mainCamera2D?.controls.reset(false)
-        this.mainCamera2D?.controls.moveTo(x, y, 0, false)
-        this.mainCamera2D?.controls.rotate( 22/14, 0, false )
-        if(this.mainCamera2D != null) return this.mainCamera2D
-        else return this.mainCamera
     }
 
     #add2DAxisCamera(renderer:Renderer)
