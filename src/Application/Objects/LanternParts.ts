@@ -18,7 +18,7 @@ let footerMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({
 let bottomDomeMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let neckMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:0.55, metalness:0.3, reflectivity:0.35}) //0x774315 //0x45D6D2
 let ornamentMaterial:THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ color: 0x885426, side:THREE.DoubleSide, roughness:1, metalness:0.1, reflectivity:0.1, transparent:true, })
-let ornamentMaterial2:THREE.MeshPhysicalMaterial
+// let ornamentMaterial2:THREE.MeshPhysicalMaterial
 
 let lampOnMaterial = new THREE.MeshPhysicalMaterial({
   metalness: .3,
@@ -66,9 +66,8 @@ export default class LanternParts{
       Promise.all([
           this.loadTexture(`${import.meta.env.BASE_URL}Assets/Images/DomeTexture.png`),
           this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/DomeBump.png`),
-          this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/ornaments2.png`),
           // this.loadTexture(`${import.meta.env.BASE_URL}/Assets/Images/GlassPattern.png`)
-      ]).then(([colorTexture, bumpTexture, GlassPatternTexture]) => {
+      ]).then(([colorTexture, bumpTexture]) => {
      
         colorTexture.wrapS = THREE.RepeatWrapping
         colorTexture.wrapT = THREE.RepeatWrapping
@@ -128,20 +127,20 @@ export default class LanternParts{
           ornamentMaterial.bumpScale=10
           ornamentMaterial.alphaMap = ornamentMaterialBump
 
-          ornamentMaterial2 = material.clone()
-          GlassPatternTexture.wrapS = THREE.RepeatWrapping
-          GlassPatternTexture.wrapT = THREE.RepeatWrapping
-          GlassPatternTexture.rotation = Math.PI
-          const ornamentMaterialTexture2 = GlassPatternTexture
-          const ornamentMaterialBump2 = GlassPatternTexture
-          ornamentMaterialTexture2.repeat.set(0.118, 0.020)
-          ornamentMaterialBump2.repeat.set(0.118, 0.020)
+          // ornamentMaterial2 = material.clone()
+          // GlassPatternTexture.wrapS = THREE.RepeatWrapping
+          // GlassPatternTexture.wrapT = THREE.RepeatWrapping
+          // GlassPatternTexture.rotation = Math.PI
+          // const ornamentMaterialTexture2 = GlassPatternTexture
+          // const ornamentMaterialBump2 = GlassPatternTexture
+          // ornamentMaterialTexture2.repeat.set(0.118, 0.020)
+          // ornamentMaterialBump2.repeat.set(0.118, 0.020)
 
-          ornamentMaterial2.map = ornamentMaterialTexture2
-          ornamentMaterial2.bumpMap = ornamentMaterialBump2
-          ornamentMaterial2.bumpScale = 40
-          ornamentMaterial2.alphaMap = ornamentMaterialBump2
-          ornamentMaterial2.transparent= true
+          // ornamentMaterial2.map = ornamentMaterialTexture2
+          // ornamentMaterial2.bumpMap = ornamentMaterialBump2
+          // ornamentMaterial2.bumpScale = 40
+          // ornamentMaterial2.alphaMap = ornamentMaterialBump2
+          // ornamentMaterial2.transparent= true
 
           this.createLanternObjects(scene)
       }).catch(error => {
